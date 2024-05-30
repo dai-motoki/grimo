@@ -1,0 +1,6 @@
+requests
+click
+colorama
+boto3
+streamlit
+i18nice[YAML]

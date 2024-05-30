@@ -1,0 +1,54 @@
+# docker-compose.yml
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"  # Streamlitの場合
+      # - "7860:7860"  # Gradioの場合
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/grimo
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+
+  db:
+    image: postgres:13
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=grimo
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+
+volumes:
+  db_data:
+
+# 上記の `docker-compose.yml` は以下の内容を含んでいます。
+
+# - `app` サービス:
+#   - `Dockerfile` を使用してビルド
+#   - ポート `8501`（Streamlitの場合）または `7860`（Gradioの場合）を公開
+#   - カレントディレクトリをコンテナ内の `/app` ディレクトリにマウント
+#   - `db` サービスに依存
+#   - 環境変数を設定（データベースURL、AWS認証情報、S3バケット名）
+
+# - `db` サービス:
+#   - PostgreSQL 13のイメージを使用
+#   - データを `db_data` ボリュームに永続化
+#   - データベース名、ユーザー名、パスワードを環境変数で設定
+
+# - `volumes`:
+#   - `db_data` ボリュームを定義
+
+# この設定により、アプリケーションとデータベースを含む複数のコンテナを定義し、それらを連携させることができます。また、AWS認証情報や S3 バケット名などの環境変数を設定することで、アプリケーションからAWS S3へのアクセスが可能になります。
+
+# 必要に応じて、サービスの設定やボリュームの定義を追加・修正してください。
