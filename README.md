@@ -67,9 +67,10 @@ grimo upload .
 ### パッケージのインストール
 
 インストールされたファイルはgrimoiresディレクトリに格納されます。
+-v でバージョン指定をお願いします（ここも何も指定がない場合最新を取得するようにする予定です）
 
 ```
-grimo install package_name
+grimo install package_name -v version
 
 project/
 ├── grimoires/
