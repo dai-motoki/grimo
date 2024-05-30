@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: grimo
-Version: 0.1.0
+Version: 0.1.2
 Summary: Abstract Programming Language Package Manager
 Home-page: https://github.com/dai-motoki/grimo
 Author: dai motoki
@@ -14,16 +14,54 @@ Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 Description-Content-Type: text/markdown
-Requires-Dist: requests
-Requires-Dist: click
-Requires-Dist: colorama
-Requires-Dist: boto3
-Requires-Dist: streamlit
-Requires-Dist: i18nice[YAML]
+License-File: LICENSE
 
 ## Pythonパッケージ開発のための要件定義書
 
 ### ゴール: 抽象プログラミング言語パッケージマネージャー「grimo」をPythonで作成
+
+
+## 0. 利用方法
+
+### コマンドラインオプション
+```
+                        利用可能なサブコマンド
+    install             パッケージをインストールする（利用可）
+    upload              パッケージをアップロードする（利用可）
+    search              パッケージを検索する（未開発）
+    update              パッケージをアップデートする（未開発）
+    uninstall           パッケージをアンインストールする（未開発）
+```
+
+### パッケージのアップロード
+
+```
+grimo upload .
+
+project/
+├── metadata.json # パッケージのメタデータ
+├── package_name/
+│   ├── def.md # パッケージの定義
+│   ├── util.md # パッケージのユーティリティ
+│   ├── var.md # パッケージの変数
+│   └── ...
+```
+
+### パッケージのインストール
+
+```
+grimo install package_name
+
+project/
+├── grimoires/
+│   ├── package_name/
+│   │   ├── metadata.json # パッケージのメタデータ
+│   │   ├── def.md # パッケージの定義
+│   │   ├── util.md # パッケージのユーティリティ
+│   │   ├── var.md # パッケージの変数
+│   │   └── ...
+
+```
 
 ## 1. 目的
 
