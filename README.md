@@ -66,6 +66,8 @@ grimo upload .
 
 ### パッケージのインストール
 
+インストールされたファイルはgrimoiresディレクトリに格納されます。
+
 ```
 grimo install package_name
 
