@@ -1,0 +1,3 @@
+[submodule "grimo/i18n"]
+	path = grimo/i18n
+	url = ./grimo/i18n
