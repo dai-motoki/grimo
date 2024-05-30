@@ -1,21 +1,37 @@
-## Pythonパッケージ開発のための要件定義書
-
-### ゴール: 抽象プログラミング言語パッケージマネージャー「grimo」をPythonで作成
+# 抽象プログラミング言語パッケージマネージャー「grimo」
 
 
 ## 0. 利用方法
+＊ 現在パッケージマネージャーは各々ご自身のAWSアカウントにおけるS3バケットに格納する形になっています。
+バージョンアップに従って、全員共有バケットにする予定です。
+
+
+1. grimo install
+```
+pip install grimo
+```
+
+2. AWSのバケットとしてgrimoを作成
+
+3. AWSのローカル設定を行う
+```
+export AWS_SECRET_ACCESS_KEY=xxx
+export AWS_ACCESS_KEY_ID=xxx
+```
 
 ### コマンドラインオプション
+```
                         利用可能なサブコマンド
     install             パッケージをインストールする（利用可）
     upload              パッケージをアップロードする（利用可）
     search              パッケージを検索する（未開発）
     update              パッケージをアップデートする（未開発）
     uninstall           パッケージをアンインストールする（未開発）
+```
 
 ### パッケージのアップロード
 
-grimo upload .
+```
 
 project/
 ├── metadata.json # パッケージのメタデータ
@@ -25,8 +41,32 @@ project/
 │   ├── var.md # パッケージの変数
 │   └── ...
 
+```
+
+```metadata.json
+
+{
+  "name": "package_name",
+  "version": "1.0.0",
+  "language": "python",
+  "description": "package_description",
+  "category": "ai",
+  "tags": [
+    "tool",
+    "development"
+  ]
+}
+```
+
+project ディレクトリ内で
+```
+grimo upload .
+
+```
+
 ### パッケージのインストール
 
+```
 grimo install package_name
 
 project/
@@ -38,6 +78,7 @@ project/
 │   │   ├── var.md # パッケージの変数
 │   │   └── ...
 
+```
 
 ## 1. 目的
 

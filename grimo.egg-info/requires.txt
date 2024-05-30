@@ -3,4 +3,4 @@ click
 colorama
 boto3
 streamlit
-i18nice[YAML]
+i18nice[yaml]
