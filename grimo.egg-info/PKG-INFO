@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: grimo
-Version: 0.1.2
+Version: 0.1.4
 Summary: Abstract Programming Language Package Manager
 Home-page: https://github.com/dai-motoki/grimo
 Author: dai motoki
@@ -16,12 +16,26 @@ Classifier: Programming Language :: Python :: 3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
 
-## Pythonパッケージ開発のための要件定義書
-
-### ゴール: 抽象プログラミング言語パッケージマネージャー「grimo」をPythonで作成
+# 抽象プログラミング言語パッケージマネージャー「grimo」
 
 
 ## 0. 利用方法
+＊ 現在パッケージマネージャーは各々ご自身のAWSアカウントにおけるS3バケットに格納する形になっています。
+バージョンアップに従って、全員共有バケットにする予定です。
+
+
+1. grimo install
+```
+pip install grimo
+```
+
+2. AWSのバケットとしてgrimoを作成
+
+3. AWSのローカル設定を行う
+```
+export AWS_SECRET_ACCESS_KEY=xxx
+export AWS_ACCESS_KEY_ID=xxx
+```
 
 ### コマンドラインオプション
 ```
@@ -36,7 +50,6 @@ License-File: LICENSE
 ### パッケージのアップロード
 
 ```
-grimo upload .
 
 project/
 ├── metadata.json # パッケージのメタデータ
@@ -45,12 +58,37 @@ project/
 │   ├── util.md # パッケージのユーティリティ
 │   ├── var.md # パッケージの変数
 │   └── ...
+
+```
+
+```metadata.json
+
+{
+  "name": "package_name",
+  "version": "1.0.0",
+  "language": "python",
+  "description": "package_description",
+  "category": "ai",
+  "tags": [
+    "tool",
+    "development"
+  ]
+}
+```
+
+project ディレクトリ内で
+```
+grimo upload .
+
 ```
 
 ### パッケージのインストール
 
+インストールされたファイルはgrimoiresディレクトリに格納されます。
+-v でバージョン指定をお願いします（ここも何も指定がない場合最新を取得するようにする予定です）
+
 ```
-grimo install package_name
+grimo install package_name -v version
 
 project/
 ├── grimoires/
