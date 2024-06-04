@@ -9,8 +9,8 @@ from grimo.core import Grimo
 from grimo.package import Package, search_packages, get_package
 from grimo.utils import print_success, print_error, print_warning
 
-# Load translation files
-i18n.load_path.append('grimo/i18n')
+# 翻訳ファイルをロード
+i18n.load_path.append(os.path.join(os.path.dirname(__file__), 'i18n'))
 i18n.set('locale', 'ja')  # Set default locale to English
 
 def main():

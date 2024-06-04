@@ -1,0 +1,45 @@
+import os
+import anthropic
+from rich.progress import Progress
+
+# 翻訳言語集
+translations_languages = [
+    "fr", "de", "en", "es", "it", "pt", "ru", "zh", "ko", "ar", "hi", "bn", "fa", "tr", "vi", "th", "uk", "pl", "nl", "sv", "no", "da", "fi"
+]
+
+# 日本語ファイルの内容を読み込む
+with open("./README.md", "r", encoding="utf-8") as f:
+    japanese_content = f.read()
+
+# Anthropic APIの設定
+client = anthropic.Anthropic(
+    api_key=os.environ.get("ANTHROPIC_API_KEY"),
+)
+
+# 進捗表示用のプログレスバー
+with Progress() as progress:
+    task = progress.add_task("[green]Translating...", total=len(translations_languages))
+
+    for language in translations_languages:
+        language_name = translations_languages[language]
+
+        # Claude3を使って翻訳
+        message = client.messages.create(
+            model="claude-3-haiku-20240307",
+            max_tokens=4096,
+            temperature=0,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"{japanese_content} を {language_name} に翻訳してください。"
+                }
+            ]
+        )
+        translated_text = message.content[0].text
+
+        # 翻訳結果を出力
+        with open(f"Readme_translate/README_{language}.md", "w", encoding="utf-8") as f:
+            f.write(translated_text)
+            print(f"{language_name}翻訳完了")
+
+        task.advance(1)
