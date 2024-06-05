@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: grimo
-Version: 1.2.2
+Version: 1.2.3
 Summary: Abstract Programming Language Package Manager
 Home-page: https://github.com/dai-motoki/grimo
 Author: dai motoki
@@ -132,6 +132,11 @@ ex. grimo search "banner"
 
 
 ## 開発者向け
+
+
+### 全体のフロー図
+
+![全体フロー](./grimo_flow.png)
 ### パッケージのインストール
 
 インストールされたファイルはgrimoiresディレクトリに格納されます。
