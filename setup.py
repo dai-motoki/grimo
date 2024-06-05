@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='grimo',
-    version='0.1.8',
+    version='1.2.0',
     description='Abstract Programming Language Package Manager',
     long_description=open('README.md', 'r').read(),
     long_description_content_type='text/markdown',  # 追加: long_descriptionの形式を指定

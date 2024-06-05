@@ -63,6 +63,18 @@ ja:
   already_up_to_date: "%{package}は既に最新です"
   uninstall_success: "%{package}のアンインストールに成功しました"
   uninstall_error: "アンインストールエラー: %{error}"
+  list_help: "インストール済みのパッケージをリストする（未開発）"
+  list_success: "%{count}個のインストール済みパッケージが見つかりました"
+  list_error: "リストエラー: %{error}"
+  no_packages_installed: "インストール済みのパッケージが見つかりませんでした"
+  usage: "利用方法: "
+  positional_argument: "引数"
+  options: "オプション"
+  show_help_message_and_exit: "ヘルプメッセージを表示して終了する"
+  the_following_arguments_are_required: "次の引数が必要です: "
+  error: "エラー:"
+
+
 """
 
 # 翻訳実行
