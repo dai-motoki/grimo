@@ -163,7 +163,6 @@ def main():
     )
 
     # --- List Subcommand ---
-    list_parser = subparsers.add_parser(
         "list",
         help=i18n.t('message.list_help')
     )
