@@ -49,15 +49,30 @@ class StorageManager:
 
             # バケット内のオブジェクト一覧を取得
             objects = self.s3.Bucket(self.bucket_name).objects.filter(Prefix=prefix)
+            import shutil
+
+            # grimoires_dirのパスを設定
+            package_first_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            grimoires_dir = os.path.join(package_first_dir, "grimo/grimoires")
+
+            # grimoires_dirにあるパッケージを一式削除
+            if os.path.exists(grimoires_dir):
+                shutil.rmtree(grimoires_dir)
+                # print(f"{grimoires_dir} の内容を削除しました。")
+
+            # オブジェクトをダウンロード
             for obj in objects:
-                # 各オブジェクトをダウンロード
-                # grimoires_dir = os.path.join(os.getcwd(), "grimoires")
-                package_first_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                grimoires_dir = os.path.join(package_first_dir, "grimo/grimoires")
-                file_path = os.path.join(grimoires_dir, obj.key)
+                # obj.keyからバージョン番号を削除する
+                key_parts = obj.key.split('/')
+                if len(key_parts) > 2:
+                    key_parts.pop(1)  # 2番目の要素（バージョン番号）を削除
+                new_key = '/'.join(key_parts)
+                
+                print(new_key)
+                file_path = os.path.join(grimoires_dir, new_key)
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
                 self.s3.Object(self.bucket_name, obj.key).download_file(file_path)
-                print(f"{obj.key} を {file_path} にダウンロードしました。")
+                print(f"{new_key} を {file_path} にダウンロードしました。")
             
         except ClientError as e:
             print(f"デバッグ: ダウンロードに失敗: {e}")  # デバッグ用のprint文を追加
