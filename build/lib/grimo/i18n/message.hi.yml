@@ -1,7 +1,5 @@
-यह है हिंदी में अनुवादित संस्करण:
-
 hi:
-  cli_description: "एक抽象भाषा पैकेज प्रबंधक Grimo"
+  cli_description: "एक抽象语言 पैकेज मैनेजर Grimo"
   subcommand_help: "उपलब्ध उप-कमांड"
   search_help: "पैकेज खोजें (अभी विकास में)"
   query_help: "खोज क्वेरी"
@@ -27,3 +25,13 @@ hi:
   already_up_to_date: "%{package} पहले से ही नवीनतम है"
   uninstall_success: "%{package} सफलतापूर्वक अनइंस्टॉल किया गया"
   uninstall_error: "अनइंस्टॉल त्रुटि: %{error}"
+  list_help: "इंस्टॉल किए गए पैकेज सूचीबद्ध करें (अभी विकास में)"
+  list_success: "%{count} इंस्टॉल किए गए पैकेज मिले"
+  list_error: "सूची त्रुटि: %{error}"
+  no_packages_installed: "कोई इंस्टॉल किए गए पैकेज नहीं मिले"
+  usage: "उपयोग: "
+  positional_argument: "पदस्थ तर्क"
+  options: "विकल्प"
+  show_help_message_and_exit: "सहायता संदेश दिखाएं और बाहर निकलें"
+  the_following_arguments_are_required: "निम्नलिखित तर्क आवश्यक हैं: "
+  error: "त्रुटि:"

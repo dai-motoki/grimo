@@ -76,29 +76,36 @@ class Package:
             tags=metadata.get("tags", [])
         )
 
-def search_packages(query: str = "", language: str = "", category: str = "", tags: List[str] = []) -> List[Package]:
-    packages = []
-    metadata_list = StorageManager(bucket_name="grimo").list_files()
-    for metadata in metadata_list:
-        package = Package.from_metadata(metadata)
-        if query and query not in package.name:
-            continue
-        if language and language != package.language:
-            continue
-        if category and category != package.category:
-            continue
-        if tags and not set(tags).issubset(set(package.tags)):
-            continue
-        packages.append(package)
-    return packages
+def search_packages(                                                               # パッケージを検索する関数
+    query: str = "",                                                               # - クエリ文字列（デフォルトは空文字列）
+    language: str = "",                                                            # - 言語（デフォルトは空文字列）
+    category: str = "",                                                            # - カテゴリ（デフォルトは空文字列）
+    tags: List[str] = []                                                           # - タグのリスト（デフォルトは空リスト）
+) -> List[Package]:                                                                # - 戻り値はPackageオブジェクトのリスト
+    packages = []                                                                  # パッケージのリストを初期化
+    metadata_list = StorageManager(bucket_name="grimo").list_files()               # ストレージマネージャからメタデータのリストを取得
+    package_metadata_files = [m for m in metadata_list if m.endswith("metadata.json")]  # メタデータファイルのみを抽出
+    for metadata_file in package_metadata_files:                                   # 各メタデータファイルに対してループ
+        metadata = StorageManager(bucket_name="grimo").get_file_metadata(metadata_file)  # - メタデータを取得
+        package = Package.from_metadata(metadata)                                  # - メタデータからパッケージオブジェクトを生成
+        if query and query not in package.name:                                    # - クエリが指定されていて、パッケージ名にクエリが含まれていない場合
+            continue                                                               # -- 次のメタデータに進む
+        if language and language != package.language:                              # - 言語が指定されていて、パッケージの言語と一致しない場合
+            continue                                                               # -- 次のメタデータに進む
+        if category and category != package.category:                              # - カテゴリが指定されていて、パッケージのカテゴリと一致しない場合
+            continue                                                               # -- 次のメタデータに進む
+        if tags and not set(tags).issubset(set(package.tags)):                     # - タグが指定されていて、パッケージのタグに含まれていない場合
+            continue                                                               # -- 次のメタデータに進む
+        packages.append(package)                                                   # - パッケージをリストに追加
+    return packages                                                                # パッケージのリストを返す
 
 def get_package(object_name: str, version: str) -> Package:
     # print(f"デバッグ: package.pyのget_package関数が呼び出されました。")
     # print(f"デバッグ: object_name: {object_name}, version: {version}")
     # メタデータを取得する
     try:
-        # metadata = StorageManager(bucket_name="grimo").get_file_metadata(f"{name}/{version}/metadata.json")
-        metadata = StorageManager(bucket_name="grimo").download_file(object_name, version)
+        metadata_file = f"{object_name}/{version}/metadata.json"
+        metadata = StorageManager(bucket_name="grimo").get_file_metadata(metadata_file)
         # print(f"デバッグ: 取得したメタデータ: {metadata}")  #  デバッグ用のprint文を追加
     except AttributeError as e:
         if "'s3.ServiceResource' object has no attribute 'head_object'" in str(e):
@@ -107,5 +114,25 @@ def get_package(object_name: str, version: str) -> Package:
             raise
     if not metadata:
         raise ValueError(f"Package {object_name} {version} not found.")
-    # return Package.from_metadata(metadata)
-# 
+    return Package.from_metadata(metadata)
+
+def list_installed_packages() -> List[Package]:
+    """
+    インストール済みのパッケージをリストする関数
+
+    :return: インストール済みパッケージのリスト
+    """
+    packages = []
+    grimoires_dir = os.path.join(os.getcwd(), "grimoires")
+    if not os.path.exists(grimoires_dir):
+        return packages
+
+    for package_name in os.listdir(grimoires_dir):
+        package_dir = os.path.join(grimoires_dir, package_name)
+        if os.path.isdir(package_dir):
+            metadata_file = os.path.join(package_dir, "metadata.json")
+            if os.path.exists(metadata_file):
+                with open(metadata_file, "r") as f:
+                    metadata = json.load(f)
+                    packages.append(Package.from_metadata(metadata))
+    return packages

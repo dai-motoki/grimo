@@ -1,12 +1,11 @@
 # cli.py
 
-import argparse
+import grimo.argparse_multi
 import json
 import os
 import i18n
 
-from grimo.core import Grimo
-from grimo.package import Package, search_packages, get_package
+from grimo.package import Package, search_packages, get_package, list_installed_packages
 from grimo.utils import print_success, print_error, print_warning
 
 # 翻訳ファイルをロード
@@ -15,7 +14,7 @@ i18n.set('locale', 'ja')  # Set default locale to English
 
 def main():
     # --- Language Selection ---
-    parser = argparse.ArgumentParser(add_help=False)
+    parser = grimo.argparse_multi.ArgumentParser(add_help=False)
     parser.add_argument(
         "-l", "--lang",
         choices=['ja', 'fr', 'de', 'en', 'es', 'it', 'pt', 'ru', 'zh', 'ko', 'ar'],
@@ -27,9 +26,10 @@ def main():
     i18n.set('locale', args.lang)
 
     # --- Main Argument Parser ---
-    parser = argparse.ArgumentParser(
+    parser = grimo.argparse_multi.ArgumentParser(
         description=i18n.t('message.cli_description'),
-        parents=[parser]
+        parents=[parser],
+        formatter_class=grimo.argparse_multi.RawDescriptionHelpFormatter  # ヘルプメッセージのフォーマットを変更
     )
     subparsers = parser.add_subparsers(
         dest="command",
@@ -39,13 +39,57 @@ def main():
     # --- Search Subcommand ---
     search_parser = subparsers.add_parser(
         "search",
-        help=i18n.t('message.search_help')
+        help=i18n.t('message.search_help'),
+        # description="""\
+        #     `grimo search` コマンドは、指定されたクエリに基づいてパッケージを検索するために使用されます。
+
+        #     ### 使用方法
+
+        #     ```sh
+        #     grimo search <query> [オプション]
+        #     ```
+
+        #     ### 引数
+
+        #     - `<query>`: 検索クエリを指定します。
+
+        #     ### オプション
+
+        #     - `-l`, `--language <言語>`: 言語を指定します。
+        #     - `-c`, `--category <カテゴリ>`: カテゴリを指定します。
+        #     - `-t`, `--tags <タグ>`: タグを指定します。複数のタグをスペースで区切って指定できます。
+
+        #     ### 例
+
+        #     1. 基本的な検索:
+        #         ```sh
+        #         grimo search "example query"
+        #         ```
+
+        #     2. 言語を指定して検索:
+        #         ```sh
+        #         grimo search "example query" --language "en"
+        #         ```
+
+        #     3. カテゴリを指定して検索:
+        #         ```sh
+        #         grimo search "example query" --category "utilities"
+        #         ```
+
+        #     4. タグを指定して検索:
+        #         ```sh
+        #         grimo search "example query" --tags "tag1" "tag2"
+        #         ```
+
+        #     このコマンドを使用することで、指定された条件に一致するパッケージを簡単に検索することができます。
+        #     """
         # help=i18n.t('message.upload_success')
     )
     search_parser.add_argument(
         "query",
         type=str,
-        help=i18n.t('message.query_help')
+        help=i18n.t('message.query_help'),
+        # nargs="?"  # ここへ追加
     )
     search_parser.add_argument(
         "-l", "--language", 
@@ -118,10 +162,21 @@ def main():
         help=i18n.t('message.package_path_help')
     )
 
+    # --- List Subcommand ---
+        "list",
+        help=i18n.t('message.list_help')
+    )
+
+    args = parser.parse_args(unknown)
+
+
     args = parser.parse_args(unknown) 
 
     if args.command == 'search':
-        packages = search_packages(
+        if args.query == "all":
+            packages = search_packages()
+        else:
+            packages = search_packages(
             query=args.query,
             language=args.language,
             category=args.category,
@@ -177,6 +232,17 @@ def main():
             print_success(i18n.t('message.uninstall_success', package=package))
         except Exception as e:
             print_error(i18n.t('message.uninstall_error', error=str(e)))
+    elif args.command == 'list':
+        try:
+            packages = list_installed_packages()  # インストール済みパッケージをリストする関数を呼び出す
+            if packages:
+                print_success(i18n.t('message.list_success', count=len(packages)))
+                for package in packages:
+                    print(f"- {package}")
+            else:
+                print_warning(i18n.t('message.no_packages_installed'))
+        except Exception as e:
+            print_error(i18n.t('message.list_error', error=str(e)))
 
     elif args.command == "upload":                                                                                # uploadサブコマンドの場合
         """
@@ -197,23 +263,14 @@ def main():
             Exception: アップロード処理中にエラーが発生した場合
         """
         try:                                                                                                      # 例外処理のtry節
-            # print("デバッグ: メタデータファイルのパスを作成")  # デバッグ用のprint文を追加
             metadata_path = os.path.join(args.package_path, "metadata.json")                                      # - メタデータファイルのパスを作成
-            # print(f"デバッグ: メタデータファイルのパス: {metadata_path}")  # デバッグ用のprint文を追加
             with open(metadata_path, "r") as f:                                                                   # - メタデータファイルを読み込みモードで開く
-                # print("デバッグ: メタデータファイルを読み込み中")  # デバッグ用のprint文を追加
                 metadata = json.load(f)                                                                           # -- メタデータをJSONとして読み込む
-                # print(f"デバッグ: 読み込んだメタデータ: {metadata}")  # デバッグ用のprint文を追加
                                                                                                                   #
-            # print("デバッグ: Packageインスタンスを作成")  # デバッグ用のprint文を追加
             package = Package(**metadata)                                                                         # - メタデータを使ってPackageインスタンスを作成
-            # print(f"デバッグ: 作成したPackageインスタンス: {package}")  # デバッグ用のprint文を追加
-            # print("デバッグ: パッケージをアップロード")  # デバッグ用のprint文を追加
             package.upload(args.package_path)                                                                     # - パッケージをアップロード
-            # print("デバッグ: アップロード完了")  # デバッグ用のprint文を追加
             print_success(i18n.t("message.upload_success", package=package))                                      # - 成功メッセージを表示
         except Exception as e:                                                                                    # 例外処理のexcept節
-            # print(f"デバッグ: アップロード中にエラーが発生: {str(e)}")  # デバッグ用のprint文を追加
             print_error(i18n.t("message.upload_error", error=str(e)))                                             # - エラーメッセージを表示
     else:
         parser.print_help()
