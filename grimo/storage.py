@@ -7,8 +7,6 @@ logger = logging.getLogger(__name__)
 
 class StorageManager:
     def __init__(self, bucket_name, region_name="ap-northeast-1"):
-        # self.s3 = boto3.client('s3', region_name=region_name)
-        # AWS アクセスキーとシークレットキーを環境変数から取得
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
         aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
         self.s3 = boto3.resource('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
@@ -22,27 +20,20 @@ class StorageManager:
         :param object_name: S3バケット内のオブジェクト名
         :return: アップロードの成否
         """
-        # print(f"デバッグ*: ファイルをアップロード: {file_path} -> {self.bucket_name}/{object_name}")  # デバッグ用のprint文を追加
-        # file_path = "metadata.json"
         try:
             if os.path.isfile(file_path):  # file_pathがファイルかどうかチェックを追加
-                # バケットオブジェクトを取得
                 bucket = self.s3.Bucket(self.bucket_name)
 
-# ファイルをアップロード
                 bucket.put_object(
                     Key=object_name,
                     Body=open(file_path, 'rb')
                 )
-                # self.s3.upload_file(file_path, self.bucket_name, object_name)
             else:
                 print(f"デバッグ: アップロードに失敗: {file_path}はファイルではありません")  # デバッグ用のprint文を追加
                 return False
         except ClientError as e:
-            # print(f"デバッグ: アップロードに失敗: {e}")  # デバッグ用のprint文を追加
             logging.error(e)
             return False
-        # print(f"デバッグ: アップロード成功: {file_path} -> {self.bucket_name}/{object_name}")  # デバッグ用のprint文を追加
         return True
 
     def download_file(self, object_name, version):
@@ -54,9 +45,7 @@ class StorageManager:
         :return: ダウンロードの成否
         """
         try:
-            # オブジェクトのプレフィックスを設定
             prefix = f"{object_name}/{version}/"
-            # print(f"デバッグ: ダウンロード開始: {self.bucket_name}/{prefix}")  # デバッグ用のprint文を追加
 
             # バケット内のオブジェクト一覧を取得
             objects = self.s3.Bucket(self.bucket_name).objects.filter(Prefix=prefix)
@@ -68,7 +57,6 @@ class StorageManager:
                 self.s3.Object(self.bucket_name, obj.key).download_file(file_path)
                 print(f"{obj.key} を {file_path} にダウンロードしました。")
             
-            # print(f"デバッグ: ダウンロード成功: {self.bucket_name}/{prefix}")  # デバッグ用のprint文を追加
         except ClientError as e:
             print(f"デバッグ: ダウンロードに失敗: {e}")  # デバッグ用のprint文を追加
             logging.error(e)
@@ -97,7 +85,8 @@ class StorageManager:
         :return: ファイル一覧
         """
         try:
-            response = self.s3.list_objects_v2(Bucket=self.bucket_name, Prefix=prefix)
+            # list_objects_v2メソッドはs3.ServiceResourceには存在しないため、クライアントを使用する
+            response = self.s3.meta.client.list_objects_v2(Bucket=self.bucket_name, Prefix=prefix)
             files = [content['Key'] for content in response.get('Contents', [])]
         except ClientError as e:
             logging.error(e)
@@ -112,8 +101,10 @@ class StorageManager:
         :return: ファイルのメタデータ
         """
         try:
-            response = self.s3.head_object(Bucket=self.bucket_name, Key=object_name)
-            metadata = response['Metadata']
+            import json
+            obj = self.s3.Object(self.bucket_name, object_name)
+            metadata = json.loads(obj.get()['Body'].read().decode('utf-8'))
+
         except ClientError as e:
             logging.error(e)
             return None
