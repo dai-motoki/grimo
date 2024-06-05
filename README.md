@@ -64,6 +64,56 @@ grimo upload .
 
 ```
 
+
+### 検索コマンド
+
+`grimo search` コマンドは、指定されたクエリに基づいてパッケージを検索するために使用されます。以下はその使い方です。
+
+### 使用方法
+
+```sh
+grimo search <query> [オプション]
+```
+
+### 引数
+
+- `<query>`: 検索クエリを指定します。
+ex. grimo search "banner"
+
+### オプション
+
+- `-l`, `--language <言語>`: 言語を指定します。（別の-lコマンドとバッティングしているので修正します）
+- `-c`, `--category <カテゴリ>`: カテゴリを指定します。
+- `-t`, `--tags <タグ>`: タグを指定します。複数のタグをスペースで区切って指定できます。
+
+### 例
+
+1. 基本的な検索:
+    ```sh
+    grimo search "example query"
+    ```
+
+2. 言語を指定して検索: （
+    ```sh
+    grimo search "example query" --language "python"
+    ```
+
+3. カテゴリを指定して検索:
+    ```sh
+    grimo search "example query" --category "utilities"
+    ```
+
+4. タグを指定して検索:
+    ```sh
+    grimo search "example query" --tags "tag1" "tag2"
+    ```
+
+このコマンドを使用することで、指定された条件に一致するパッケージを簡単に検索することができます。
+```
+
+
+
+## 開発者向け
 ### パッケージのインストール
 
 インストールされたファイルはgrimoiresディレクトリに格納されます。
