@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: grimo
-Version: 0.1.8
+Version: 1.2.0
 Summary: Abstract Programming Language Package Manager
 Home-page: https://github.com/dai-motoki/grimo
 Author: dai motoki
@@ -15,12 +15,6 @@ Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: requests
-Requires-Dist: click
-Requires-Dist: colorama
-Requires-Dist: boto3
-Requires-Dist: streamlit
-Requires-Dist: i18nice[YAML]
 
 # 抽象プログラミング言語パッケージマネージャー「grimo」
 
