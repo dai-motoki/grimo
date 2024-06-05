@@ -103,18 +103,13 @@ def get_package(object_name: str, version: str) -> Package:
     # print(f"デバッグ: package.pyのget_package関数が呼び出されました。")
     # print(f"デバッグ: object_name: {object_name}, version: {version}")
     # メタデータを取得する
-    try:
-        metadata_file = f"{object_name}/{version}/metadata.json"
-        metadata = StorageManager(bucket_name="grimo").get_file_metadata(metadata_file)
-        # print(f"デバッグ: 取得したメタデータ: {metadata}")  #  デバッグ用のprint文を追加
-    except AttributeError as e:
-        if "'s3.ServiceResource' object has no attribute 'head_object'" in str(e):
-            raise RuntimeError("S3のServiceResourceオブジェクトにhead_object属性がありません。S3の設定を確認してください。")
-        else:
-            raise
-    if not metadata:
-        raise ValueError(f"Package {object_name} {version} not found.")
-    return Package.from_metadata(metadata)
+    # metadata_file = f"{object_name}/{version}/metadata.json"
+    # metadata = StorageManager(bucket_name="grimo").get_file_metadata(metadata_file)
+    StorageManager(bucket_name="grimo").download_file(object_name, version)
+    # print(f"デバッグ: 取得したメタデータ: {metadata}")  #  デバッグ用のprint文を追加
+    # # if not metadata:
+    # #     raise ValueError(f"Package {object_name} {version} not found.")
+    # return Package.from_metadata(metadata)
 
 def list_installed_packages() -> List[Package]:
     """
