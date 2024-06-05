@@ -5,7 +5,6 @@ import json
 import os
 import i18n
 
-from grimo.core import Grimo
 from grimo.package import Package, search_packages, get_package, list_installed_packages
 from grimo.utils import print_success, print_error, print_warning
 
