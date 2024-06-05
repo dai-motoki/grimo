@@ -5,7 +5,6 @@ import json
 import os
 import i18n
 
-from grimo.core import Grimo
 from grimo.package import Package, search_packages, get_package, list_installed_packages
 from grimo.utils import print_success, print_error, print_warning
 
@@ -194,16 +193,12 @@ def main():
     elif args.command == 'install':
         try:
             if args.version:
-                # package = get_package(args.package, args.version)
                 get_package(args.package, args.version)
             else:
                 print("デバッグ: 最新バージョンを取得")
-                # package = get_package(args.package, "latest")
                 get_package(args.package, "latest")
-            # package.install(args.force)
             print_success(i18n.t('message.install_success',
                                  package=args.package+args.version))
-            # print_success(i18n.t('message.install_success'))
         except Exception as e:
             print_error(i18n.t('message.install_error', error=str(e)))
 
