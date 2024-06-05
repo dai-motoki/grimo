@@ -1,4 +1,4 @@
 pip install wheel
 python setup.py sdist bdist_wheel
-twine upload dist/grimo-1.2.2*
+twine upload dist/grimo-1.2.3*
 
