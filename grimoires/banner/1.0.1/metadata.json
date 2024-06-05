@@ -1,0 +1,11 @@
+{
+  "name": "banner",
+  "version": "1.0.1",
+  "language": "python",
+  "description": "banner",
+  "category": "ai",
+  "tags": [
+    "tool",
+    "development"
+  ]
+}
