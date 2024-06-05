@@ -51,7 +51,9 @@ class StorageManager:
             objects = self.s3.Bucket(self.bucket_name).objects.filter(Prefix=prefix)
             for obj in objects:
                 # 各オブジェクトをダウンロード
-                grimoires_dir = os.path.join(os.getcwd(), "grimoires")
+                # grimoires_dir = os.path.join(os.getcwd(), "grimoires")
+                package_first_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                grimoires_dir = os.path.join(package_first_dir, "grimoires")
                 file_path = os.path.join(grimoires_dir, obj.key)
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
                 self.s3.Object(self.bucket_name, obj.key).download_file(file_path)
