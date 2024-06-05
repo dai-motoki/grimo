@@ -15,7 +15,7 @@ i18n.set('locale', 'ja')  # Set default locale to English
 
 def main():
     # --- Language Selection ---
-    parser = argparse.ArgumentParser(add_help=False)
+    parser = argparse.ArgumentParser(add_help=True)
     parser.add_argument(
         "-l", "--lang",
         choices=['ja', 'fr', 'de', 'en', 'es', 'it', 'pt', 'ru', 'zh', 'ko', 'ar'],
@@ -25,6 +25,7 @@ def main():
     )
     args, unknown = parser.parse_known_args()
     i18n.set('locale', args.lang)
+    parser = argparse.ArgumentParser(lang=args.lang)
 
     # --- Main Argument Parser ---
     parser = argparse.ArgumentParser(

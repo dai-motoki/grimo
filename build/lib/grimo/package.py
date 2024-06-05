@@ -93,13 +93,9 @@ def search_packages(query: str = "", language: str = "", category: str = "", tag
     return packages
 
 def get_package(object_name: str, version: str) -> Package:
-    # print(f"デバッグ: package.pyのget_package関数が呼び出されました。")
-    # print(f"デバッグ: object_name: {object_name}, version: {version}")
     # メタデータを取得する
     try:
-        # metadata = StorageManager(bucket_name="grimo").get_file_metadata(f"{name}/{version}/metadata.json")
         metadata = StorageManager(bucket_name="grimo").download_file(object_name, version)
-        # print(f"デバッグ: 取得したメタデータ: {metadata}")  #  デバッグ用のprint文を追加
     except AttributeError as e:
         if "'s3.ServiceResource' object has no attribute 'head_object'" in str(e):
             raise RuntimeError("S3のServiceResourceオブジェクトにhead_object属性がありません。S3の設定を確認してください。")

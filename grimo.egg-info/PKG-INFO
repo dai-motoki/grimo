@@ -15,6 +15,12 @@ Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: requests
+Requires-Dist: click
+Requires-Dist: colorama
+Requires-Dist: boto3
+Requires-Dist: streamlit
+Requires-Dist: i18nice[YAML]
 
 # 抽象プログラミング言語パッケージマネージャー「grimo」
 
