@@ -68,7 +68,6 @@ class StorageManager:
                     key_parts.pop(1)  # 2番目の要素（バージョン番号）を削除
                 new_key = '/'.join(key_parts)
                 
-                print(new_key)
                 file_path = os.path.join(grimoires_dir, new_key)
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
                 self.s3.Object(self.bucket_name, obj.key).download_file(file_path)
