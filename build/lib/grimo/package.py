@@ -54,7 +54,13 @@ class Package:
         print_success(f"Uninstalled {self}")
 
     def upload(self, package_path: str) -> None:                                                                # パッケージをアップロードする関数
-        package_dir = get_package_dir(self.name)
+        # package_dir = get_package_dir(self.name)
+        package_dir = os.getcwd()
+        if not package_dir.endswith(self.name):
+            raise ValueError(f"パッケージディレクトリ名 '{os.path.basename(package_dir)}' と metadata.json の name '{self.name}' が一致していません。metadata.json の name とパッケージディレクトリ名を一致させ、metadata.json をパッケージディレクトリに入れてください。")
+        metadata_file = os.path.join(package_dir, "metadata.json")
+        if not os.path.exists(metadata_file):
+            raise FileNotFoundError(f"パッケージディレクトリ '{package_dir}' に metadata.json が見つかりません。metadata.json をパッケージディレクトリに入れてください。")
         for root, _, files in os.walk(package_dir):
             for file in files:
                 file_path = os.path.join(root, file)
