@@ -4,6 +4,7 @@ setup.py
 grimo/README_USAGE.md
 grimo/__init__.py
 grimo/argparse_multi.py
+grimo/auth.py
 grimo/cli.py
 grimo/core.py
 grimo/package.py

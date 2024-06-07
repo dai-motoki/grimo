@@ -34,8 +34,8 @@ export AWS_ACCESS_KEY_ID=xxx
 ```
 
 project/
-├── metadata.json # パッケージのメタデータ
 ├── package_name/
+├── metadata.json # パッケージのメタデータ
 │   ├── def.md # パッケージの定義
 │   ├── util.md # パッケージのユーティリティ
 │   ├── var.md # パッケージの変数

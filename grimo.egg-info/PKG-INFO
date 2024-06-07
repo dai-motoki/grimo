@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: grimo
-Version: 1.2.7
+Version: 1.2.8
 Summary: Abstract Programming Language Package Manager
 Home-page: https://github.com/dai-motoki/grimo
 Author: dai motoki
@@ -52,8 +52,8 @@ export AWS_ACCESS_KEY_ID=xxx
 ```
 
 project/
-├── metadata.json # パッケージのメタデータ
 ├── package_name/
+├── metadata.json # パッケージのメタデータ
 │   ├── def.md # パッケージの定義
 │   ├── util.md # パッケージのユーティリティ
 │   ├── var.md # パッケージの変数
