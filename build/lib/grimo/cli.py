@@ -1,16 +1,77 @@
-# cli.py
-
 import grimo.argparse_multi
 import json
 import os
 import i18n
+import requests
+from getpass import getpass
 
 from grimo.package import Package, search_packages, get_package, list_installed_packages
 from grimo.utils import print_success, print_error, print_warning
 
+# 認証トークンのファイルパス
+GRIMO_TOKEN_PATH = '.grimo_token'
+
+# サーバーの URL
+SERVER_URL = "http://localhost:8000" 
+# SERVER_URL = "https://3bd1f058e743.ngrok.app" 
+
+def login(server_url):
+    """Supabase にメールアドレスとパスワードでログインし、認証トークンを保存します。"""
+    email = input("メールアドレス: ")
+    password = getpass("パスワード: ")
+
+    try:
+        response = requests.post(
+            f"{server_url}/login",
+            data={"email": email, "password": password}
+        )
+        response.raise_for_status()  # HTTPエラーチェック
+
+        data = response.json()
+        with open(GRIMO_TOKEN_PATH, 'w') as f:
+            f.write(data["access_token"])
+            f.close()  # ファイルをクローズ
+        print_success("ログインに成功しました！")
+
+    except requests.exceptions.HTTPError as err:
+        print_error(f"ログインに失敗しました: {err.response.text}")
+    except Exception as e:
+        print_error(f"ログイン中にエラーが発生しました: {str(e)}")
+
+def signup(server_url):
+    """Supabase に新規ユーザーを登録します。"""
+    email = input("メールアドレス: ")
+    password = getpass("パスワード: ")
+
+    try:
+        response = requests.post(
+            f"{server_url}/signup",
+            data={"email": email, "password": password}
+        )
+        response.raise_for_status()  # HTTPエラーチェック
+
+        print_success(response.json()["message"])
+
+    except requests.exceptions.HTTPError as err:
+        print_error(f"新規登録に失敗しました: {err.response.text}")
+    except Exception as e:
+        print_error(f"新規登録中にエラーが発生しました: {str(e)}")
+
+def is_authenticated():
+    """ユーザーが認証済みかどうかを確認します。"""
+    return os.path.exists(GRIMO_TOKEN_PATH)
+
+def get_auth_token():
+    """認証トークンを取得します。"""
+    if not is_authenticated():
+        print_error("ログインしていません。`grimo login` でログインしてください。")
+        return None
+    with open(GRIMO_TOKEN_PATH, 'r') as f:
+        return f.read().strip()
+
 # 翻訳ファイルをロード
 i18n.load_path.append(os.path.join(os.path.dirname(__file__), 'i18n'))
-i18n.set('locale', 'ja')  # Set default locale to English
+i18n.set('locale', 'ja')  # Set default locale to Japanese
 
 def main():
     # --- Language Selection ---
@@ -20,7 +81,6 @@ def main():
         choices=['ja', 'fr', 'de', 'en', 'es', 'it', 'pt', 'ru', 'zh', 'ko', 'ar'],
         default='ja',
         help="日本語: ja\nFrançais: fr\nDeutsch: de\nEnglish: en\nEspañol: es\nItaliano: it\nPortuguês: pt\nРусский: ru\n中文: zh\n한국어: ko\nالعربية: ar\n"
-
     )
     args, unknown = parser.parse_known_args()
     i18n.set('locale', args.lang)
@@ -36,60 +96,29 @@ def main():
         help=i18n.t('message.subcommand_help')
     )
 
+    # --- Login Subcommand ---
+    login_parser = subparsers.add_parser(
+        "login",
+        help="Grimo にログインします"
+    )
+    login_parser.set_defaults(func=lambda args: login(SERVER_URL))
+
+    # --- Signup Subcommand ---
+    signup_parser = subparsers.add_parser(
+        "signup",
+        help="Grimo に新規登録します"
+    )
+    signup_parser.set_defaults(func=lambda args: signup(SERVER_URL))
+
     # --- Search Subcommand ---
     search_parser = subparsers.add_parser(
         "search",
-        help=i18n.t('message.search_help'),
-        # description="""\
-        #     `grimo search` コマンドは、指定されたクエリに基づいてパッケージを検索するために使用されます。
-
-        #     ### 使用方法
-
-        #     ```sh
-        #     grimo search <query> [オプション]
-        #     ```
-
-        #     ### 引数
-
-        #     - `<query>`: 検索クエリを指定します。
-
-        #     ### オプション
-
-        #     - `-l`, `--language <言語>`: 言語を指定します。
-        #     - `-c`, `--category <カテゴリ>`: カテゴリを指定します。
-        #     - `-t`, `--tags <タグ>`: タグを指定します。複数のタグをスペースで区切って指定できます。
-
-        #     ### 例
-
-        #     1. 基本的な検索:
-        #         ```sh
-        #         grimo search "example query"
-        #         ```
-
-        #     2. 言語を指定して検索:
-        #         ```sh
-        #         grimo search "example query" --language "en"
-        #         ```
-
-        #     3. カテゴリを指定して検索:
-        #         ```sh
-        #         grimo search "example query" --category "utilities"
-        #         ```
-
-        #     4. タグを指定して検索:
-        #         ```sh
-        #         grimo search "example query" --tags "tag1" "tag2"
-        #         ```
-
-        #     このコマンドを使用することで、指定された条件に一致するパッケージを簡単に検索することができます。
-        #     """
-        # help=i18n.t('message.upload_success')
+        help=i18n.t('message.search_help')
     )
     search_parser.add_argument(
         "query",
         type=str,
-        help=i18n.t('message.query_help'),
-        # nargs="?"  # ここへ追加
+        help=i18n.t('message.query_help')
     )
     search_parser.add_argument(
         "-l", "--language", 
@@ -168,10 +197,20 @@ def main():
         help=i18n.t('message.list_help')
     )
 
+    # すべてのサブコマンド定義の後に args = parser.parse_args(unknown) を移動
     args = parser.parse_args(unknown)
 
+    # --- コマンド実行前の認証チェック ---
+    if args.command != 'login' and args.command != 'signup' and not is_authenticated():
+        print_error("ログインが必要です。`grimo login` でログインしてください。")
+        exit(1)
 
-    args = parser.parse_args(unknown) 
+    if hasattr(args, 'func'):
+        args.func(args)  # サブコマンドに対応する関数を呼び出す
+        if args.command == 'login' or args.command == 'signup':  # login または signup コマンド実行後なら終了
+            exit(0)
+    else:
+        parser.print_help()
 
     if args.command == 'search':
         if args.query == "all":
@@ -261,10 +300,13 @@ def main():
         """
         try:                                                                                                      # 例外処理のtry節
             metadata_path = os.path.join(args.package_path, "metadata.json")                                      # - メタデータファイルのパスを作成
+            print(metadata_path)
             with open(metadata_path, "r") as f:                                                                   # - メタデータファイルを読み込みモードで開く
                 metadata = json.load(f)                                                                           # -- メタデータをJSONとして読み込む
                                                                                                                   #
             package = Package(**metadata)                                                                         # - メタデータを使ってPackageインスタンスを作成
+            # package.upload(metadata_path)
+            print(args.package_path)
             package.upload(args.package_path)                                                                     # - パッケージをアップロード
             print_success(i18n.t("message.upload_success", package=package))                                      # - 成功メッセージを表示
         except Exception as e:                                                                                    # 例外処理のexcept節
