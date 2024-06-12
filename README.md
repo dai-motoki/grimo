@@ -1,50 +1,60 @@
-# 抽象プログラミング言語パッケージマネージャー「grimo」
+"grimo" のREADMEに含めるすべてのリードインを記述します。
 
+## 抽象プログラミング言語パッケージマネージャー「grimo」
 
-## 0. 利用方法
+### 0. 利用方法
 ＊ 現在パッケージマネージャーは各々ご自身のAWSアカウントにおけるS3バケットに格納する形になっています。
 バージョンアップに従って、全員共有バケットにする予定です。
 
+1. **grimo のインストール**
 
-1. grimo install
-```
-pip install grimo
-```
+   ```bash
+   pip install grimo
+   ```
 
-2. AWSのバケットとしてgrimoを作成
+2. **AWS S3 バケットの作成**
 
-3. AWSのローカル設定を行う
-```
-export AWS_SECRET_ACCESS_KEY=xxx
-export AWS_ACCESS_KEY_ID=xxx
-```
+   `grimo` では、パッケージを AWS S3 バケットに保存します。 まだ S3 バケットを作成していない場合は、AWS マネジメントコンソールから "grimo" という名前のバケットを作成してください。
+
+3. **AWS 認証情報の設定**
+
+   `grimo` が S3 バケットにアクセスできるように、AWS の認証情報を設定する必要があります。 環境変数 `AWS_SECRET_ACCESS_KEY` と `AWS_ACCESS_KEY_ID` に、それぞれあなたの AWS シークレットアクセスキーとアクセスキー ID を設定してください。
+
+   ```bash
+   export AWS_SECRET_ACCESS_KEY=xxx
+   export AWS_ACCESS_KEY_ID=xxx
+   ```
 
 ### コマンドラインオプション
+
+`grimo` では、以下のコマンドラインオプションが利用可能です。
+
 ```
                         利用可能なサブコマンド
     install             パッケージをインストールする（利用可）
     upload              パッケージをアップロードする（利用可）
-    search              パッケージを検索する（未開発）
+    search              パッケージを検索する（利用可）
     update              パッケージをアップデートする（未開発）
     uninstall           パッケージをアンインストールする（未開発）
 ```
 
 ### パッケージのアップロード
 
-```
+`grimo upload` コマンドを使って、独自のパッケージをアップロードできます。パッケージは以下のディレクトリ構造で作成してください。
 
+```
 project/
 ├── package_name/
-├── metadata.json # パッケージのメタデータ
+│   ├── metadata.json # パッケージのメタデータ
 │   ├── def.md # パッケージの定義
 │   ├── util.md # パッケージのユーティリティ
 │   ├── var.md # パッケージの変数
 │   └── ...
-
 ```
 
-```metadata.json
+`metadata.json` ファイルには、パッケージのメタ情報を以下のように記述します。
 
+```json
 {
   "name": "package_name",
   "version": "1.0.0",
@@ -58,91 +68,73 @@ project/
 }
 ```
 
-project ディレクトリ内で
-```
+パッケージをアップロードするには、`package_name` ディレクトリで以下のコマンドを実行します。
+
+```bash
 grimo upload .
-
 ```
-
 
 ### 検索コマンド
 
-`grimo search` コマンドは、指定されたクエリに基づいてパッケージを検索するために使用されます。以下はその使い方です。
+`grimo search` コマンドは、指定されたクエリに基づいてパッケージを検索するために使用されます。 以下のように使用します。
 
-### 使用方法
-
-```sh
+```bash
 grimo search <query> [オプション]
 ```
 
-### 引数
+**引数**
 
-- `<query>`: 検索クエリを指定します。
-ex. grimo search "banner"
+* `<query>`: 検索クエリを指定します。 例: `grimo search "banner"`
 
-### オプション
+**オプション**
 
-- `-l`, `--language <言語>`: 言語を指定します。（別の-lコマンドとバッティングしているので修正します）
-- `-c`, `--category <カテゴリ>`: カテゴリを指定します。
-- `-t`, `--tags <タグ>`: タグを指定します。複数のタグをスペースで区切って指定できます。
+* `-l`, `--language <言語>`: 検索対象の言語を指定します。
+* `-c`, `--category <カテゴリ>`: 検索対象のカテゴリを指定します。
+* `-t`, `--tags <タグ>`: 検索対象のタグを指定します。 複数のタグをスペースで区切って指定できます。
 
-### 例
+**例**
 
-1. 基本的な検索:
-    ```sh
-    grimo search "example query"
-    ```
+* 基本的な検索:
+  ```bash
+  grimo search "example query"
+  ```
 
-2. 言語を指定して検索: （
-    ```sh
-    grimo search "example query" --language "python"
-    ```
+* 言語を指定して検索:
+  ```bash
+  grimo search "example query" --language "python"
+  ```
 
-3. カテゴリを指定して検索:
-    ```sh
-    grimo search "example query" --category "utilities"
-    ```
+* カテゴリを指定して検索:
+  ```bash
+  grimo search "example query" --category "utilities"
+  ```
 
-4. タグを指定して検索:
-    ```sh
-    grimo search "example query" --tags "tag1" "tag2"
-    ```
+* タグを指定して検索:
+  ```bash
+  grimo search "example query" --tags "tag1" "tag2"
+  ```
 
-このコマンドを使用することで、指定された条件に一致するパッケージを簡単に検索することができます。
+### パッケージのインストール
 
+`grimo install` コマンドを使って、パッケージをインストールできます。 インストールされたファイルは `grimoires` ディレクトリに格納されます。
 
+```bash
+grimo install package_name -v version
+```
 
+例えば、`package_name` というパッケージのバージョン `1.0.0` をインストールするには、以下のコマンドを実行します。
+
+```bash
+grimo install package_name -v 1.0.0
+```
 
 ## 開発者向け
-
 
 ### 全体のフロー図
 
 ![全体フロー](./grimo_flow.png)
-### パッケージのインストール
 
-インストールされたファイルはgrimoiresディレクトリに格納されます。
--v でバージョン指定をお願いします（ここも何も指定がない場合最新を取得するようにする予定です）
-
-```
-grimo install package_name -v version
-
-project/
-├── grimoires/
-│   ├── package_name/
-│   │   ├── metadata.json # パッケージのメタデータ
-│   │   ├── def.md # パッケージの定義
-│   │   ├── util.md # パッケージのユーティリティ
-│   │   ├── var.md # パッケージの変数
-│   │   └── ...
-
-```
-
-## 1. 目的
-
-多様なプログラミング言語のパッケージを一元管理できる、強力かつユーザーフレンドリーな抽象プログラミング言語パッケージマネージャー「grimo」をPythonで実装する。grimoは、プログラミング言語に依存せず、あらゆるパッケージの検索、インストール、アップグレードをシームレスに実行できるツールを目指します。
-
-## 2. パッケージの基本構造
+### パッケージの基本構造
 
 ```
 grimo/
@@ -159,6 +151,10 @@ grimo/
 │   ├── test_package.py
 │   ├── test_storage.py
 │   └── ...
+├── auth/
+    ├── Procfile
+    ├── requirements.txt
+    └── server.py
 ├── docs/
 │   ├── conf.py
 │   ├── index.rst
@@ -175,7 +171,7 @@ grimo/
 └── app.py                # Streamlit/Gradio アプリケーション
 ```
 
-## 3. setup.pyの記述
+### setup.pyの記述
 
 ```python
 from setuptools import setup, find_packages
@@ -214,51 +210,13 @@ setup(
 )
 ```
 
-
-## 3. setup.pyを利用したPyPIへのアップロード方法
+### setup.pyを利用したPyPIへのアップロード方法
 
 1. **PyPIアカウントの作成**:
    - まず、[PyPI](https://pypi.org/) にアカウントを作成します。
 
 2. **`setup.py`の準備**:
-   - `setup.py` ファイルが正しく記述されていることを確認します。例として以下のような内容です。
-
-   ```python
-   from setuptools import setup, find_packages
-
-   setup(
-       name='grimo',
-       version='0.1.0',
-       description='Abstract Programming Language Package Manager',
-       long_description=open('README.md', 'r').read(),
-       author='Your Name',
-       author_email='your@email.com',
-       url='https://github.com/your-username/grimo',
-       packages=find_packages(exclude=['tests']),
-       install_requires=[
-           'requests',
-           'click',
-           'colorama',
-           'boto3',
-           'streamlit',
-       ],
-       entry_points={
-           'console_scripts': [
-               'grimo=grimo.cli:main',
-           ],
-       },
-       classifiers=[
-           'Development Status :: 3 - Alpha',
-           'Intended Audience :: Developers',
-           'License :: OSI Approved :: MIT License',
-           'Programming Language :: Python :: 3',
-           'Programming Language :: Python :: 3.7',
-           'Programming Language :: Python :: 3.8',
-           'Programming Language :: Python :: 3.9',
-           'Programming Language :: Python :: 3.10',
-       ],
-   )
-   ```
+   - `setup.py` ファイルが正しく記述されていることを確認します。
 
 3. **必要なパッケージのインストール**:
    - パッケージをアップロードするために、`twine` をインストールします。
@@ -281,10 +239,13 @@ setup(
 6. **アップロードの確認**:
    - アップロードが成功したかどうかをPyPIのウェブサイトで確認します。
 
-これで、`setup.py` を利用してパッケージをPyPIにアップロードする手順は完了です。
+### 1. 目的
 
+多様なプログラミング言語のパッケージを一元管理できる、強力かつユーザーフレンドリーな抽象プログラミング言語パッケージマネージャー「grimo」をPythonで実装する。grimoは、プログラミング言語に依存せず、あらゆるパッケージの検索、インストール、アップグレードをシームレスに実行できるツールを目指します。
 
+## 2. パッケージの基本構造
 
+## 3. setup.pyの記述
 
 ## 4. __init__.py の役割
 
@@ -395,3 +356,69 @@ setup(
 - 仮想環境管理機能の追加
 - GUIクライアントの開発
 - プラグイン機構による拡張性の向上
+
+
+
+
+### grimo における認証サーバーを herokuにて立ち上げ
+
+Heroku で `grimo` という名前のアプリを作成したとのことですね。引き続き、FastAPI アプリケーションを `grimo` にデプロイして起動する方法を説明します。
+
+**1. ローカルリポジトリの作成と初期化**
+
+```bash
+# grimo ディレクトリに移動
+cd grimo
+
+# Git リポジトリの初期化
+git init
+```
+
+**2. アプリケーションファイルの追加とコミット**
+
+```bash
+# ファイルを追加
+git add .
+
+# コミット
+git commit -m "Initial commit" 
+```
+
+**3. Heroku リモートリポジトリの追加**
+
+```bash
+# Heroku リモートリポジトリの追加
+git remote add heroku https://git.heroku.com/grimo.git
+```
+
+**4. アプリケーションのデプロイ**
+
+```bash
+# Heroku にプッシュ
+git push heroku main
+```
+
+**5. アプリケーションの起動**
+
+```bash
+# アプリケーションの起動
+heroku open 
+```
+
+これで、`grimo` アプリケーションが Heroku 上で起動します。
+
+**補足**
+
+* `heroku open` コマンドは、Heroku 上で実行されているアプリケーションへのリンクを開きます。
+* アプリケーションが正常に起動しないと、`heroku logs` コマンドでログを確認して問題を診断してください。
+
+**さらなる手順**
+
+* 環境変数の設定: `heroku config:set` コマンドを使って環境変数を設定できます。
+* データベースの接続: Heroku はさまざまなデータベースサービスをサポートしています。必要に応じて適切なデータベースサービスを追加してください。
+* ログの確認: `heroku logs` コマンドでアプリケーションのログを確認できます。
+
+詳細については、Heroku の公式ドキュメントを参照してください。
+[https://devcenter.heroku.com/](https://devcenter.heroku.com/)
+
+これで、Heroku 上に FastAPI アプリケーションをデプロイして、Web サービスとして公開できるようになります。
