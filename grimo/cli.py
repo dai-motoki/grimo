@@ -12,6 +12,7 @@ from grimo.utils import print_success, print_error, print_warning
 GRIMO_TOKEN_PATH = '.grimo_token'
 
 # サーバーの URL
+# SERVER_URL = "http://43.206.232.28"
 SERVER_URL = "http://localhost:8000" 
 # SERVER_URL = "https://3bd1f058e743.ngrok.app" 
 
