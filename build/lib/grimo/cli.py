@@ -15,7 +15,7 @@ GRIMO_TOKEN_PATH = ".grimo_token"
 # SERVER_URL = "http://43.206.232.28"
 # SERVER_URL = "http://localhost:8000"
 # SERVER_URL = "https://3bd1f058e743.ngrok.app"
-SERVER_URL = "https://grimo-f0b5594b2437.herokuapp.com/"
+SERVER_URL = "https://grimo-f0b5594b2437.herokuapp.com"
 
 def login(server_url):
     """Supabase にメールアドレスとパスワードでログインし、認証トークンを保存します。"""
