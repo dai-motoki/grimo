@@ -23,21 +23,24 @@ def login(server_url):
     password = getpass("パスワード: ")
 
     try:
+        print(f"デバッグ: ログインリクエストを送信中 - URL: {server_url}/login, Email: {email}")
         response = requests.post(
             f"{server_url}/login", data={"email": email, "password": password}
         )
         response.raise_for_status()  # HTTPエラーチェック
 
         data = response.json()
+        print(f"デバッグ: レスポンスデータ - {data}")
         with open(GRIMO_TOKEN_PATH, "w") as f:
             f.write(data["access_token"])
         print_success("ログインに成功しました！")
 
     except requests.exceptions.HTTPError as err:
         print_error(f"ログインに失敗しました: {err.response.text}")
+        print(f"デバッグ: HTTPエラー - {err.response.text}")
     except Exception as e:
         print_error(f"ログイン中にエラーが発生しました: {str(e)}")
-
+        print(f"デバッグ: 例外エラー - {str(e)}")
 
 def signup(server_url):
     """Supabase に新規ユーザーを登録します。"""
