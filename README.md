@@ -45,7 +45,7 @@
 ```
 project/
 ├── package_name/
-│   ├── metadata.json # パッケージのメタデータ
+│   ├── metadata.toml # パッケージのメタデータ
 │   ├── def.md # パッケージの定義
 │   ├── util.md # パッケージのユーティリティ
 │   ├── var.md # パッケージの変数

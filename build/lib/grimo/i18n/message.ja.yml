@@ -1,7 +1,7 @@
 ja:
   cli_description: "抽象言語 パッケージマネージャー Grimo"
   subcommand_help: "利用可能なサブコマンド"
-  search_help: "パッケージを検索する（未開発）"
+  search_help: "パッケージを検索する（利用可）"
   query_help: "検索クエリ: grimo serch allで全パッケージを検索、grimo search 'banner'でbannerに関連するパッケージを検索"
   language_help: "パッケージの言語"
   category_help: "パッケージのカテゴリ"
