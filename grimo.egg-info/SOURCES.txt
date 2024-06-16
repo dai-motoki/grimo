@@ -7,6 +7,7 @@ grimo/argparse_multi.py
 grimo/auth.py
 grimo/cli.py
 grimo/core.py
+grimo/def_trans.md
 grimo/package.py
 grimo/req_cli.md
 grimo/req_readme.md

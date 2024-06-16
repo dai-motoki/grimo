@@ -18,8 +18,8 @@ import subprocess  # 追加: subprocess モジュールのインポート
 import shlex  # 追加: shlex モジュールのインポート
 
 # サーバーの URL
-# SERVER_URL = "https://grimo-f0b5594b2437.herokuapp.com"  # 適宜変更
-SERVER_URL = "http://127.0.0.1:8000"  # 適宜変更
+SERVER_URL = "https://grimo-f0b5594b2437.herokuapp.com"  # 適宜変更
+# SERVER_URL = "http://127.0.0.1:8000"  # 適宜変更
 
 # ロギングの設定
 logging.basicConfig(level=logging.INFO,

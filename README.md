@@ -449,3 +449,14 @@ heroku open
 [https://devcenter.heroku.com/](https://devcenter.heroku.com/)
 
 これで、Heroku 上に FastAPI アプリケーションをデプロイして、Web サービスとして公開できるようになります。
+
+
+
+## 設計思想
+
+| 項目 | インタプリタ | コンパイラ |
+|------|------------|------------|
+| フレームワーク Zoltraak | 構築中 | まだ |
+| プログラミング言語 Niwatoko | まだ | 構築中 |
+| パッケージマネージャー Grimo | まだ | 構築中 |
+| パッケージ(banner, i18niwatoko) | まだ | 構築中 |
