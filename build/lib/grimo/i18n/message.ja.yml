@@ -21,7 +21,7 @@ ja:
   update_success: "%{package}がバージョン%{version}にアップデートされました"
   update_error: "アップデートエラー: %{error}"
   upload_success: "%{package}がアップロードされました"
-  upload_error: "アップロードエラー: %{error}"
+  upload_error: "アップロードエラー: grimo login を行ってください: %{error}"
   already_up_to_date: "%{package}は既に最新です"
   uninstall_success: "%{package}のアンインストールに成功しました"
   uninstall_error: "アンインストールエラー: %{error}"
