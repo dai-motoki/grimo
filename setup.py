@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='grimo',
-    version='1.3.3',
+    version='1.3.4',
     description='Abstract Programming Language Package Manager',
     long_description=open('README.md', 'r').read(),
     long_description_content_type='text/markdown',  # 追加: long_descriptionの形式を指定
@@ -16,6 +16,7 @@ setup(
         'colorama',
         'boto3',
         'streamlit',
+        'aiofiles',
         'i18nice[YAML]',
     ],
     entry_points={
