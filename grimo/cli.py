@@ -22,7 +22,8 @@ SERVER_URL = "https://grimo-f0b5594b2437.herokuapp.com"  # 適宜変更
 # SERVER_URL = "http://127.0.0.1:8000"  # 適宜変更
 
 # ロギングの設定
-logging.basicConfig(level=logging.INFO,
+# logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 def my_logger(*args, level='DEBUG'):
     """呼び出し元のファイル名、行番号、任意の引数を指定されたログレベルで出力する関数
@@ -198,8 +199,8 @@ def parse_version_spec(version_spec: str) -> Dict:
     elif re.match(r'^\[([\d\.]+), *([\d\.]+)\]$', version_spec):  # "[3.3.2, 3.6.3]" のような形式
         start, end = re.match(r'^\[([\d\.]+), *([\d\.]+)\]$', version_spec).groups()
         return {"type": "range", "start": start, "end": end, "inclusive": True}
-    elif re.match(r'^\(([\d\.]+), *([\d\.]+)\)$', version_spec):  # "(3.3.2, 3.6.3)" のような形式
-        start, end = re.match(r'^\(([\d\.]+), *([\d\.]+)\)$', version_spec).groups()
+    elif re.match(r'^\((([\d\.]+), *([\d\.]+)\))$', version_spec):  # "(3.3.2, 3.6.3)" のような形式
+        start, end = re.match(r'^\((([\d\.]+), *([\d\.]+)\))$', version_spec).groups()
         return {"type": "range", "start": start, "end": end, "inclusive": False}
     elif re.match(r'^@M([\d\.]+)$', version_spec):  # "@M3.3.2" のような形式
         version = re.match(r'^@M([\d\.]+)$', version_spec).group(1)
@@ -394,9 +395,19 @@ async def install(package_name: str, version_spec: str = None):
                 encoded_response = json_response.get("file_content")
                 decoded_response = base64.b64decode(encoded_response)
                 my_logger(f"デバッグ: {__file__}: install: APIリクエスト送信完了 - レスポンス内容: {decoded_response}", level='DEBUG')
-                package_dir = os.path.dirname(os.path.abspath(__file__)) + "/grimoires/" + package_name + "/" + (version_data["version"] if version_data["version"] else "latest")
+
+                # --- 変更箇所ここから ---
+                # レスポンスヘッダーから実際のバージョンを取得
+                actual_version = response.headers.get("Grimo-Package-Version") 
+                if not actual_version:
+                    # レスポンスヘッダーにバージョンがない場合は、エラーとする
+                    raise ValueError("Could not get the package version from the response.")
+
+                package_dir = os.path.dirname(os.path.abspath(__file__)) + "/grimoires/" + package_name + "/" + actual_version
+                # --- 変更箇所ここまで ---
+
                 os.makedirs(package_dir, exist_ok=True)  # ディレクトリがない場合は作成
-                filename = f"{package_dir}/{package_name}-{version_spec if version_spec else 'latest'}.zip"
+                filename = f"{package_dir}/{package_name}-{actual_version}.zip"
 
                 with open(filename, "wb") as file:
                     file.write(decoded_response)
@@ -415,15 +426,14 @@ async def install(package_name: str, version_spec: str = None):
                 else:
                     my_logger("zipファイルではありません", level='WARNING')
 
-                print_success(f"パッケージ {package_name} {version_spec if version_spec else ' (latest)'} を正常にインストールしました")
-                my_logger(f"install: インストール完了 - パッケージ: {package_name}, バージョン: {version_spec if version_spec else ' (latest)'}, インストール先: {package_dir}", level='INFO')
+                print_success(f"パッケージ {package_name} {actual_version} を正常にインストールしました")
+                my_logger(f"install: インストール完了 - パッケージ: {package_name}, バージョン: {actual_version}, インストール先: {package_dir}", level='INFO')
     except aiohttp.ClientError as err:
         print_error(f"パッケージのインストールに失敗しました: {err}")
         my_logger(f"install: HTTPエラー - {err}", level='ERROR')
     except Exception as e:
         print_error(f"パッケージのインストール中にエラーが発生しました: {str(e)}")
         my_logger(f"install: 例外エラー - {str(e)}", level='ERROR')
-
 async def update(package_name: str):
     """
     指定されたパッケージを更新します。
