@@ -3,5 +3,5 @@ click
 colorama
 boto3
 streamlit
-aiofiles
+aiohttp
 i18nice[yaml]

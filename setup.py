@@ -16,7 +16,7 @@ setup(
         'colorama',
         'boto3',
         'streamlit',
-        'aiofiles',
+        'aiohttp',
         'i18nice[YAML]',
     ],
     entry_points={
