@@ -38,5 +38,5 @@ jobs:
         run: pwd
       - name: テストを実行
         run: |
-          cd ../tests
+          cd tests
           niwatoko def.md -o ../exe.md
