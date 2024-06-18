@@ -34,11 +34,11 @@ jobs:
           niwatoko -v 
           grimo install i18niwatoko
 
-      - name: ディレクトリのアクセス権限を変更
-        run: chmod -R 755 /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/grimo/grimoires
+      # - name: ディレクトリのアクセス権限を変更
+      #   run: chmod -R 755 /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/grimo/grimoires
 
-      - name: 作業ディレクトリの確認
-        run: ls /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/grimo/grimoires/i18niwatoko/1.0.0
+      # - name: 作業ディレクトリの確認
+      #   run: ls /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/grimo/grimoires/i18niwatoko/1.0.0
       - name: テストを実行
         run: |
           cd tests
