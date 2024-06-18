@@ -22,9 +22,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-          env:  # このように設定します
-            OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-            ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      
+      - name: 環境変数を設定 # 追加
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV 
 
       - name: 依存関係をインストール
         run: |
