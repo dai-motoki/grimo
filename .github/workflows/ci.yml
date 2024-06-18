@@ -40,7 +40,6 @@ jobs:
         run: |
 
           pip install openai grimo niwatoko
-          niwatoko -v 
           grimo install banner
 
 
