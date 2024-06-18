@@ -32,6 +32,7 @@ jobs:
         run: |
           pip install openai grimo niwatoko
           niwatoko -v 
+          grimo install i18niwatoko
 
       - name: ディレクトリのアクセス権限を変更
         run: chmod -R 755 /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/grimo/grimoires
@@ -41,5 +42,4 @@ jobs:
       - name: テストを実行
         run: |
           cd tests
-          grimo install i18niwatoko
           niwatoko def.md -o exe.md
