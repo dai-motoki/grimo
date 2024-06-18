@@ -34,7 +34,8 @@ jobs:
           niwatoko -v 
           grimo install banner
 
+      - name: 作業ディレクトリの確認
+        run: pwd
       - name: テストを実行
         run: |
           niwatoko test/def.md -o exe.md
-
