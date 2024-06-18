@@ -30,7 +30,8 @@ jobs:
 
       - name: 依存関係をインストール
         run: |
-          pip install grimo niwatoko
+
+          pip install openai grimo niwatoko
           grimo install banner
 
       - name: テストを実行
