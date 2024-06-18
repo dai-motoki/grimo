@@ -26,8 +26,10 @@ jobs:
       - name: 依存関係をインストール
         run: |
           pip install grimo niwatoko
+          grimo install banner
 
-      # - name: テストを実行
-      #   run: |
-      #     # ここにテストコマンドを追加
-      #     echo "テストを実行中..."
+      - name: テストを実行
+        run: |
+          # tests/def.md を利用して niwatoko test/def.md -o exe.md を行う
+          niwatoko test/def.md -o exe.md
+
