@@ -1,50 +1,24 @@
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
 jobs:
-
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
-
     steps:
       - name: チェックアウトリポジトリ
         uses: actions/checkout@v2
-
       - name: セットアップPython
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: 環境変数を設定
-        run: |
-          if [[ -z "${{ secrets.OPENAI_API_KEY }}" ]]; then
-            echo "Error: OPENAI_API_KEY is not set."
-            exit 1
-          fi
-          export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-
-          if [[ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]]; then
-            echo "Error: ANTHROPIC_API_KEY is not set."
-            exit 1
-          fi
-          export ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
+          env:  # このように設定します
+            OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+            ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       - name: 依存関係をインストール
         run: |
-
           pip install openai grimo niwatoko
+          niwatoko -v 
           grimo install banner
-
-
       - name: テストを実行
         run: |
-          # tests/def.md を利用して niwatoko test/def.md -o exe.md を行う
           niwatoko test/def.md -o exe.md
-
