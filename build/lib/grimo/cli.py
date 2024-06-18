@@ -310,7 +310,7 @@ def main():
     my_logger(f"コマンドライン引数 - {args}", level='DEBUG')
 
     # --- コマンド実行前の認証チェック ---
-    if args.command not in ["login", "signup"] and not is_authenticated():
+    if args.command not in ["login", "signup", "install", None] and not is_authenticated():
         print_error("ログインが必要です。`grimo login` でログインしてください。")
         my_logger("認証が必要です。ログインしてください。", level='ERROR')
         exit(1)

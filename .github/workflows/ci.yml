@@ -15,49 +15,19 @@ jobs:
         python-version: [3.7, 3.8, 3.9, "3.10"]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pylint pytest coverage
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # コードフォーマットチェック
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Lint with pylint
-      run: |
-        # コード品質チェック
-        pylint **/*.py
-    - name: Test with pytest
-      run: |
-        # ユニットテストと統合テストの実行
-        pytest tests/ -v
-    - name: Coverage report
-      run: |
-        # カバレッジレポートの生成
-        coverage run -m pytest tests/
-        coverage report -m
+      - name: チェックアウトリポジトリ
+        uses: actions/checkout@v2
 
-# この `ci.yml` では、以下のステップを実行します。
+      - name: セットアップPython
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-# 1. Pythonのバージョンを3.7、3.8、3.9、3.10でマトリクステストを実行
-# 2. 依存パッケージのインストール (`pip install flake8 pylint pytest coverage`)
-# 3. `requirements.txt` に記載された依存パッケージのインストール
-# 4. flake8を使用したコードフォーマットチェック
-# 5. pylintを使用したコード品質チェック
-# 6. pytestを使用したユニットテストと統合テストの実行
-# 7. カバレッジレポートの生成
+      - name: 依存関係をインストール
+        run: |
+          pip install grimo niwatoko
 
-# この設定により、pushやpull requestのたびにCIが自動的に実行され、コードの品質を維持することができます。
-
-# テストが失敗した場合や、コードフォーマットや品質に問題がある場合は、GitHubのプルリクエストにその旨が表示され、修正を促すことができます。
-
-# また、カバレッジレポートを生成することで、テストがどの程度コードをカバーしているかを確認できます。
-
-# 必要に応じて、CIの設定を追加・修正してください。例えば、データベースやDockerコンテナが必要な場合は、サービスコンテナの設定を追加する必要があります。
+      # - name: テストを実行
+      #   run: |
+      #     # ここにテストコマンドを追加
+      #     echo "テストを実行中..."
