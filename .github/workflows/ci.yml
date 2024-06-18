@@ -25,9 +25,17 @@ jobs:
 
       - name: 環境変数を設定
         run: |
+          if [[ -z "${{ secrets.OPENAI_API_KEY }}" ]]; then
+            echo "Error: OPENAI_API_KEY is not set."
+            exit 1
+          fi
           export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-          export ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
 
+          if [[ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]]; then
+            echo "Error: ANTHROPIC_API_KEY is not set."
+            exit 1
+          fi
+          export ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
       - name: 依存関係をインストール
         run: |
 
