@@ -32,11 +32,11 @@ jobs:
         run: |
           pip install openai grimo niwatoko
           niwatoko -v 
-          grimo install banner
+          grimo install i18niwatoko
 
       - name: 作業ディレクトリの確認
         run: pwd
       - name: テストを実行
         run: |
           cd tests
-          niwatoko def.md -o ../exe.md
+          niwatoko def.md -o exe.md
