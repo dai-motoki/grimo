@@ -1,3 +1,4 @@
+- sample = [./sample.md]
 - i18 = [i18niwatoko]
-生成AIの解説文章（適当に書く）をi18して
+sampleをi18して
 実行例と結果も記載

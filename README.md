@@ -1,5 +1,3 @@
-"grimo" のREADMEに含めるすべてのリードインを記述します。
-
 ## 抽象プログラミング言語パッケージマネージャー「grimo」
 
 ### 0. 利用方法
@@ -45,27 +43,59 @@
 ```
 project/
 ├── package_name/
-│   ├── metadata.toml # パッケージのメタデータ
+│   ├── grimo.toml # パッケージのメタデータ
 │   ├── def.md # パッケージの定義
 │   ├── util.md # パッケージのユーティリティ
 │   ├── var.md # パッケージの変数
 │   └── ...
 ```
 
-`metadata.json` ファイルには、パッケージのメタ情報を以下のように記述します。
+`grimo.toml` ファイルには、パッケージのメタ情報を以下のように記述します。
 
-```json
-{
-  "name": "package_name",
-  "version": "1.0.0",
-  "language": "python",
-  "description": "package_description",
-  "category": "ai",
-  "tags": [
-    "tool",
-    "development"
-  ]
-}
+```grimo.toml
+# パッケージ名
+name = "i18niwatoko"
+
+# パッケージバージョン (SemVer 形式)
+version = "1.1.0"
+
+# パッケージの説明
+description = "多言語翻訳ツール"
+
+# 作者名
+author = "dai.motoki"
+
+# 作者のメールアドレス
+email = "motoki.daisuke@kandaquantum.co.jp"
+
+# パッケージのライセンス
+license = "MIT"
+
+# Supabase Storage 上のファイルパス (アップロード後に設定されます)
+# file_path = "i18niwatoko/1.0.0/i18niwatoko.tar.gz"
+
+# その他の項目 (任意)
+language = "python"
+category = "utilities"
+tags = ["translation", "i18n"]
+homepage = "https://example.com/i18niwatoko"
+repository = "https://github.com/your-username/i18niwatoko"
+readme = """
+# i18niwatoko
+
+多言語翻訳ツールです。
+
+grimo install i18niwatoko
+
+```
+- i18niwatoko = [i18niwatoko]
+- 元ファイル = [./翻訳したいファイル]
+
+"""
+dependencies = "{ \"rich\" : \"^13.3.5\", \"claude3\" : \"^1.0.0\" }"
+# End of Selection
+
+
 ```
 
 パッケージをアップロードするには、`package_name` ディレクトリで以下のコマンドを実行します。
