@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='grimo',
-    version='1.3.36',
-    description='Abstract Programming Language Package Manager',
+    name='gowl',
+    version='0.0.1',
+    description='自然言語プログラムのテスト・評価システム',
     long_description=open('README.md', 'r').read(),
     long_description_content_type='text/markdown',  # 追加: long_descriptionの形式を指定
     author='dai motoki',
     author_email='dai.motoki@gmail.com',
-    url='https://github.com/dai-motoki/grimo',
+    url='https://github.com/dai-motoki/gowl',
     packages=find_packages(exclude=['tests']),
     install_requires=[
         'requests',
@@ -22,12 +22,12 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'grimo=grimo.cli:main',
+            'gowl=gowl.cli:main',
         ],
     },
     package_data={
     '': ['*.txt', '*.md', '*.json', '*.csv', '*.yaml', '*.yml'],
-    'grimo': ['i18n/*'],
+    'gowl': ['i18n/*'],
     },
     classifiers=[
         'Development Status :: 3 - Alpha',

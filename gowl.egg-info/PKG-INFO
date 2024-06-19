@@ -1,0 +1,480 @@
+Metadata-Version: 2.1
+Name: gowl
+Version: 0.0.1
+Summary: 自然言語プログラムのテスト・評価システム
+Home-page: https://github.com/dai-motoki/gowl
+Author: dai motoki
+Author-email: dai.motoki@gmail.com
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+"grimo" のREADMEに含めるすべてのリードインを記述します。
+
+## 抽象プログラミング言語パッケージマネージャー「grimo」
+
+### 0. 利用方法
+＊ 現在パッケージマネージャーは各々ご自身のAWSアカウントにおけるS3バケットに格納する形になっています。
+バージョンアップに従って、全員共有バケットにする予定です。
+
+1. **grimo のインストール**
+
+   ```bash
+   pip install grimo
+   ```
+
+2. **AWS S3 バケットの作成**
+
+   `grimo` では、パッケージを AWS S3 バケットに保存します。 まだ S3 バケットを作成していない場合は、AWS マネジメントコンソールから "grimo" という名前のバケットを作成してください。
+
+3. **AWS 認証情報の設定**
+
+   `grimo` が S3 バケットにアクセスできるように、AWS の認証情報を設定する必要があります。 環境変数 `AWS_SECRET_ACCESS_KEY` と `AWS_ACCESS_KEY_ID` に、それぞれあなたの AWS シークレットアクセスキーとアクセスキー ID を設定してください。
+
+   ```bash
+   export AWS_SECRET_ACCESS_KEY=xxx
+   export AWS_ACCESS_KEY_ID=xxx
+   ```
+
+### コマンドラインオプション
+
+`grimo` では、以下のコマンドラインオプションが利用可能です。
+
+```
+                        利用可能なサブコマンド
+    install             パッケージをインストールする（利用可）
+    upload              パッケージをアップロードする（利用可）
+    search              パッケージを検索する（利用可）
+    update              パッケージをアップデートする（未開発）
+    uninstall           パッケージをアンインストールする（未開発）
+```
+
+### パッケージのアップロード
+
+`grimo upload` コマンドを使って、独自のパッケージをアップロードできます。パッケージは以下のディレクトリ構造で作成してください。
+
+```
+project/
+├── package_name/
+│   ├── metadata.toml # パッケージのメタデータ
+│   ├── def.md # パッケージの定義
+│   ├── util.md # パッケージのユーティリティ
+│   ├── var.md # パッケージの変数
+│   └── ...
+```
+
+`metadata.json` ファイルには、パッケージのメタ情報を以下のように記述します。
+
+```json
+{
+  "name": "package_name",
+  "version": "1.0.0",
+  "language": "python",
+  "description": "package_description",
+  "category": "ai",
+  "tags": [
+    "tool",
+    "development"
+  ]
+}
+```
+
+パッケージをアップロードするには、`package_name` ディレクトリで以下のコマンドを実行します。
+
+```bash
+grimo upload .
+```
+
+### 検索コマンド
+
+`grimo search` コマンドは、指定されたクエリに基づいてパッケージを検索するために使用されます。 以下のように使用します。
+
+```bash
+grimo search <query> [オプション]
+```
+
+**引数**
+
+* `<query>`: 検索クエリを指定します。 例: `grimo search "banner"`
+
+**オプション**
+
+* `-l`, `--language <言語>`: 検索対象の言語を指定します。
+* `-c`, `--category <カテゴリ>`: 検索対象のカテゴリを指定します。
+* `-t`, `--tags <タグ>`: 検索対象のタグを指定します。 複数のタグをスペースで区切って指定できます。
+
+**例**
+
+* 基本的な検索:
+  ```bash
+  grimo search "example query"
+  ```
+
+* 言語を指定して検索:
+  ```bash
+  grimo search "example query" --language "python"
+  ```
+
+* カテゴリを指定して検索:
+  ```bash
+  grimo search "example query" --category "utilities"
+  ```
+
+* タグを指定して検索:
+  ```bash
+  grimo search "example query" --tags "tag1" "tag2"
+  ```
+
+
+
+### パッケージのインストール
+
+`grimo install` コマンドを使って、パッケージをインストールできます。 インストールされたファイルは `grimoires` ディレクトリに格納されます。
+以下のようなバージョン指定ルールがサポートされています。
+
+1. 特定バージョンの指定:
+   ```
+   grimo install <package>@3.3.2
+   ```
+   上記の例では、バージョン 3.3.2 を厳密に指定してインストールします。
+
+2. バージョンの範囲指定:
+   ```
+   grimo install "<package>@[3.3.2, 3.6.3]"
+   ```
+   上記の例では、バージョン 3.3.2 以上、3.6.3 以下の範囲でインストールします。
+   ```
+   grimo install "<package>@(3.3.2, 3.6.3)"
+   ```
+   上記の例では、バージョン 3.3.2 より大きく、3.6.3 より小さい範囲でインストールします。
+
+3. メジャー/マイナーバージョンの範囲指定:（未実装）
+   ```
+   grimo install <package>@M3.3.2
+   ```
+   上記の例では、バージョン 3.x.x の範囲（3.3.2 以上、4.0.0 未満）でインストールします。
+   ```
+   grimo install <package>@m3.3.2
+   ```
+   上記の例では、バージョン 3.3.x の範囲（3.3.2 以上、3.4.0 未満）でインストールします。
+
+4. 最新バージョンのインストール:
+   ```
+   grimo install <package>@latest
+   ```
+   上記の例では、パッケージの最新バージョンをインストールします。
+
+インストールされたパッケージは、`grimoires` ディレクトリ内に保存されます。
+
+## 開発者向け
+
+### 全体のフロー図
+
+![全体フロー](./grimo_flow.png)
+
+### パッケージの基本構造
+
+```
+grimo/
+├── grimo/                # パッケージのコアロジック
+│   ├── __init__.py
+│   ├── core.py
+│   ├── utils.py
+│   ├── package.py      # パッケージ操作関連モジュール
+│   ├── storage.py      # ストレージ操作関連モジュール
+│   └── ...
+├── tests/
+│   ├── test_core.py
+│   ├── test_utils.py
+│   ├── test_package.py
+│   ├── test_storage.py
+│   └── ...
+├── auth/
+    ├── Procfile
+    ├── requirements.txt
+    └── server.py
+├── docs/
+│   ├── conf.py
+│   ├── index.rst
+│   └── ...
+├── README.md
+├── LICENSE
+├── setup.py
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── .github/workflows/
+│   ├── ci.yml
+│   └── cd.yml
+└── app.py                # Streamlit/Gradio アプリケーション
+```
+
+### setup.pyの記述
+
+```python
+from setuptools import setup, find_packages
+
+setup(
+    name='grimo',
+    version='0.1.0',
+    description='Abstract Programming Language Package Manager',
+    long_description=open('README.md', 'r').read(),
+    author='Your Name',
+    author_email='your@email.com',
+    url='https://github.com/your-username/grimo',
+    packages=find_packages(exclude=['tests']),
+    install_requires=[
+        'requests',
+        'click',
+        'colorama',
+        'boto3',          # AWS SDK for Python
+        'streamlit',      # or 'gradio'
+    ],
+    entry_points={
+        'console_scripts': [
+            'grimo=grimo.cli:main',
+        ],
+    },
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+    ],
+)
+```
+
+### setup.pyを利用したPyPIへのアップロード方法
+
+1. **PyPIアカウントの作成**:
+   - まず、[PyPI](https://pypi.org/) にアカウントを作成します。
+
+2. **`setup.py`の準備**:
+   - `setup.py` ファイルが正しく記述されていることを確認します。
+
+3. **必要なパッケージのインストール**:
+   - パッケージをアップロードするために、`twine` をインストールします。
+     ```sh
+     pip install twine
+     ```
+
+4. **パッケージのビルド**:
+   - パッケージをビルドします。
+     ```sh
+     python setup.py sdist bdist_wheel
+     ```
+
+5. **PyPIへのアップロード**:
+   - `twine` を使用してパッケージをPyPIにアップロードします。
+     ```sh
+     twine upload dist/*
+     ```
+
+6. **アップロードの確認**:
+   - アップロードが成功したかどうかをPyPIのウェブサイトで確認します。
+
+### 1. 目的
+
+多様なプログラミング言語のパッケージを一元管理できる、強力かつユーザーフレンドリーな抽象プログラミング言語パッケージマネージャー「grimo」をPythonで実装する。grimoは、プログラミング言語に依存せず、あらゆるパッケージの検索、インストール、アップグレードをシームレスに実行できるツールを目指します。
+
+## 2. パッケージの基本構造
+
+## 3. setup.pyの記述
+
+## 4. __init__.py の役割
+
+- パッケージの初期化処理
+- `__version__` 変数でパッケージバージョンを定義
+- パッケージの公開APIをインポート
+
+## 5. README.md の記述内容
+
+- **パッケージの概要**: grimoの目的、機能、メリットを具体的に記述
+- **インストール方法**: `pip install grimo` 等の手順を明記
+- **使用方法**: 基本的なコマンド (`grimo install`, `grimo search` など) の使用例を提示
+- **サポートするプログラミング言語とパッケージ**: 具体的に記載
+- **ライセンス**: パッケージのライセンス情報を記載
+- **貢献方法**: バグ報告、プルリクエスト、ドキュメント改善などの方法を説明
+- **サポート方法**: 問い合わせ先 (メーリングリスト、Issue tracker、Slackチャンネルなど) を記載
+
+## 6. LICENSE ファイル
+
+- **MIT License** 
+- **Apache License 2.0**
+- **GNU General Public License (GPL)**
+- **BSD License** 
+  上記から選択、またはその他の適切なライセンスを明記
+
+## 7. パッケージのバージョン管理
+
+- セマンティックバージョニング (MAJOR.MINOR.PATCH) を採用
+
+## 8. テスト
+
+- ユニットテストと統合テストを実施
+  - `unittest` モジュールを使用
+  - テストケース: 正常系、異常系、境界値などを網羅
+  - カバレッジ測定: `coverage.py` などを使用
+  - CLIコマンドの実行結果を検証: 
+    - 異なるコマンドラインオプション、引数の組み合わせをテスト
+    - 想定される標準出力、標準エラー出力を検証
+    - エラー処理 (不正な引数、ファイルが存在しない場合など) をテスト
+
+## 9. ドキュメント作成
+
+- Sphinx を使用し、以下の内容を記述
+  - インストール方法
+  - コマンドリファレンス: `grimo install`, `grimo search` など、各コマンドの詳細な説明、オプション、使用例を記載
+  - APIドキュメント
+  - パッケージの依存関係
+  - 開発者向けドキュメント: 貢献方法、テスト方法、コーディング規約など
+  - ドキュメントはHTML形式で生成し、Vercel等を用いてWeb上に公開
+
+## 10. Docker化とCI/CD
+
+- Docker:
+  - `Dockerfile` でビルドと実行環境を定義
+  - `docker-compose.yml` で複数コンテナ (アプリケーション、データベースなど) を定義
+- CI/CD:
+  - GitHub Actions を使用
+  - `ci.yml`:
+    - push, pull request 毎に実行
+    - コードチェック (flake8, pylint など)、テスト実行、カバレッジ測定
+  - `cd.yml`:
+    - タグプッシュ時に実行
+    - Dockerイメージのビルド、Docker Hub への push
+    - PyPI へのパッケージリリース
+
+## 11. Webアプリケーション (Streamlit/Gradio)
+
+- UI:
+  - パッケージの検索: 
+    - キーワード検索
+    - プログラミング言語、カテゴリ、タグによる絞り込み
+  - パッケージの詳細表示:
+    - パッケージ名、バージョン、説明、作者、ライセンス、依存関係などを表示
+    - README.md の内容を表示
+  - パッケージのインストール、アップデート、アンインストール:
+    - プログレスバーを表示
+    - エラー発生時はエラーメッセージを表示
+  - パッケージのアップロード:
+    - パッケージ名、バージョン、説明、プログラミング言語、カテゴリ、タグなどを設定
+    - パッケージファイルをアップロード
+- バックエンド:
+  - `grimo` パッケージのコマンドを呼び出して処理を実行
+  - AWS S3 などのストレージサービスと連携し、パッケージファイルを保存、取得
+
+## 12. ストレージ
+
+- AWS S3 を使用
+  - Terraform を使用して S3 バケットを作成、管理
+  - パッケージファイル (テキスト、画像、動画など) を保存
+- `grimo.storage` モジュール:
+  - S3 へのファイルアップロード、ダウンロード、削除機能を提供
+  - ファイルのメタデータ (パッケージ名、バージョン、説明など) を保存、取得する機能を提供
+
+## 13. その他
+
+- ロギング: 処理の記録、エラー発生時の原因究明に役立てる
+- エラー処理: 想定されるエラーを適切に処理し、分かりやすいエラーメッセージを表示
+- セキュリティ: パッケージのアップロード、ダウンロード時のセキュリティ対策を実施
+- パフォーマンス: 処理速度の向上、リソース使用量の削減に取り組む
+
+## 14. 開発体制
+
+- チームで開発を行う場合は、GitHub Flow などの開発フローを定義し、円滑な開発を進める
+
+## 15. 今後の展望
+
+- パッケージの依存関係解決機能の追加
+- 仮想環境管理機能の追加
+- GUIクライアントの開発
+- プラグイン機構による拡張性の向上
+
+
+
+
+### grimo における認証サーバーを herokuにて立ち上げ
+
+Heroku で `grimo` という名前のアプリを作成したとのことですね。引き続き、FastAPI アプリケーションを `grimo` にデプロイして起動する方法を説明します。
+
+**1. ローカルリポジトリの作成と初期化**
+
+```bash
+# grimo ディレクトリに移動
+cd grimo
+
+# Git リポジトリの初期化
+git init
+```
+
+**2. アプリケーションファイルの追加とコミット**
+
+```bash
+# ファイルを追加
+git add .
+
+# コミット
+git commit -m "Initial commit" 
+```
+
+**3. Heroku リモートリポジトリの追加**
+
+```bash
+# Heroku リモートリポジトリの追加
+git remote add heroku https://git.heroku.com/grimo.git
+```
+
+**4. アプリケーションのデプロイ**
+
+```bash
+# Heroku にプッシュ
+git push heroku main
+```
+
+**5. アプリケーションの起動**
+
+```bash
+# アプリケーションの起動
+heroku open 
+```
+
+これで、`grimo` アプリケーションが Heroku 上で起動します。
+
+**補足**
+
+* `heroku open` コマンドは、Heroku 上で実行されているアプリケーションへのリンクを開きます。
+* アプリケーションが正常に起動しないと、`heroku logs` コマンドでログを確認して問題を診断してください。
+
+**さらなる手順**
+
+* 環境変数の設定: `heroku config:set` コマンドを使って環境変数を設定できます。
+* データベースの接続: Heroku はさまざまなデータベースサービスをサポートしています。必要に応じて適切なデータベースサービスを追加してください。
+* ログの確認: `heroku logs` コマンドでアプリケーションのログを確認できます。
+
+詳細については、Heroku の公式ドキュメントを参照してください。
+[https://devcenter.heroku.com/](https://devcenter.heroku.com/)
+
+これで、Heroku 上に FastAPI アプリケーションをデプロイして、Web サービスとして公開できるようになります。
+
+
+
+## 設計思想
+
+| 項目 | インタプリタ | コンパイラ |
+|------|------------|------------|
+| フレームワーク Zoltraak | 構築中 | まだ |
+| プログラミング言語 Niwatoko | まだ | 構築中 |
+| パッケージマネージャー Grimo | まだ | 構築中 |
+| パッケージ(banner, i18niwatoko) | まだ | 構築中 |

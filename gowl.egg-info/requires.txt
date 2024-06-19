@@ -1,0 +1,8 @@
+requests
+click
+colorama
+boto3
+streamlit
+aiohttp
+aiofiles
+i18nice[yaml]
