@@ -17,9 +17,8 @@ import re  # 追加: re モジュールのインポート
 import subprocess  # 追加: subprocess モジュールのインポート
 import shlex  # 追加: shlex モジュールのインポート
 
-# サーバーの URL
-SERVER_URL = "https://grimo-f0b5594b2437.herokuapp.com"  # 適宜変更
-# SERVER_URL = "http://127.0.0.1:8000"  # 適宜変更
+# サーバーの URL を環境変数から取得
+DEFAULT_SERVER_URL = "https://grimo-f0b5594b2437.herokuapp.com"
 
 # ロギングの設定
 # logging.basicConfig(level=logging.INFO,
@@ -235,9 +234,17 @@ def main():
         default="ja",
         help="日本語: ja\nFrançais: fr\nDeutsch: de\nEnglish: en\nEspañol: es\nItaliano: it\nPortuguês: pt\nРусский: ru\n中文: zh\n한국어: ko\nالعربية: ar\n",
     )
+    parser.add_argument(
+        "--server-url",
+        type=str,
+        default=DEFAULT_SERVER_URL,
+        help="サーバーのURLを指定します。デフォルトは 'https://grimo-f0b5594b2437.herokuapp.com' です。",
+    )
     args, unknown = parser.parse_known_args()
     i18n.set("locale", args.lang)
     my_logger(f"言語設定 - {args.lang}", level='DEBUG')
+    server_url = args.server_url
+    my_logger(f"サーバーURL設定 - {server_url}", level='DEBUG')
 
     # --- Main Argument Parser ---
     parser = grimo.argparse_multi.ArgumentParser(
@@ -251,11 +258,11 @@ def main():
 
     # --- Login Subcommand ---
     login_parser = subparsers.add_parser("login", help="Grimo にログインします")
-    login_parser.set_defaults(func=lambda args: login(SERVER_URL))
+    login_parser.set_defaults(func=lambda args: login(server_url))
 
     # --- Signup Subcommand ---
     signup_parser = subparsers.add_parser("signup", help="Grimo に新規登録します")
-    signup_parser.set_defaults(func=lambda args: signup(SERVER_URL))
+    signup_parser.set_defaults(func=lambda args: signup(server_url))
 
     # --- Search Subcommand ---
     search_parser = subparsers.add_parser(
@@ -264,7 +271,7 @@ def main():
     search_parser.add_argument(
         "package_name", type=str, help=i18n.t("message.query_help")
     )
-    search_parser.set_defaults(func=lambda args: search(args.package_name))
+    search_parser.set_defaults(func=lambda args: search(args.package_name, server_url))
 
     # --- Install Subcommand ---
     install_parser = subparsers.add_parser(
@@ -273,7 +280,7 @@ def main():
     install_parser.add_argument(
         "package_spec", type=str, help=i18n.t("message.package_help")
     )
-    install_parser.set_defaults(func=handle_install)  # コマンドハンドラを変更
+    install_parser.set_defaults(func=lambda args: handle_install(args, server_url))  # コマンドハンドラを変更
 
     # --- Update Subcommand ---
     update_parser = subparsers.add_parser(
@@ -282,7 +289,7 @@ def main():
     update_parser.add_argument(
         "package_name", type=str, help=i18n.t("message.package_help")
     )
-    update_parser.set_defaults(func=lambda args: update(args.package_name))
+    update_parser.set_defaults(func=lambda args: update(args.package_name, server_url))
 
     # --- Uninstall Subcommand ---
     uninstall_parser = subparsers.add_parser(
@@ -291,7 +298,7 @@ def main():
     uninstall_parser.add_argument(
         "package_name", type=str, help=i18n.t("message.package_help")
     )
-    uninstall_parser.set_defaults(func=lambda args: uninstall(args.package_name))
+    uninstall_parser.set_defaults(func=lambda args: uninstall(args.package_name, server_url))
 
     # --- Upload Subcommand ---
     upload_parser = subparsers.add_parser(
@@ -300,11 +307,11 @@ def main():
     upload_parser.add_argument(
         "package_path", type=str, help=i18n.t("message.package_path_help")
     )
-    upload_parser.set_defaults(func=lambda args: upload(args.package_path))
+    upload_parser.set_defaults(func=lambda args: upload(args.package_path, server_url))
 
     # --- List Subcommand ---
     list_parser = subparsers.add_parser("list", help=i18n.t("message.list_help"))
-    list_parser.set_defaults(func=lambda args: list_packages())
+    list_parser.set_defaults(func=lambda args: list_packages(server_url))
 
     args = parser.parse_args(unknown)
     my_logger(f"コマンドライン引数 - {args}", level='DEBUG')
@@ -324,7 +331,7 @@ def main():
     else:
         parser.print_help()
 
-async def handle_install(args):
+async def handle_install(args, server_url):
     """install コマンドを処理する関数。
     パッケージ名とバージョン指定を分離します。
     """
@@ -333,19 +340,20 @@ async def handle_install(args):
     version_spec = package_parts[1] if len(package_parts) > 1 else None
 
     # install 関数を直接呼び出す
-    await install(package_name, version_spec)  # run_grimo_command を削除
+    await install(package_name, server_url, version_spec)  # run_grimo_command を削除
 
 
-async def search(package_name: str):
+async def search(package_name: str, server_url: str):
     """
     指定されたパッケージを検索します。
 
     Args:
         package_name (str): 検索するパッケージ名
+        server_url (str): サーバーのURL
     """
     try:
         my_logger(f"search package: {package_name} - APIリクエストを送信中", level='DEBUG')
-        response = make_api_request("GET", f"{SERVER_URL}/packages/search/{package_name}")
+        response = make_api_request("GET", f"{server_url}/packages/search/{package_name}")
         versions = response.json()
         my_logger(f"search package: {package_name} - レスポンス受信: {versions}", level='DEBUG')
 
@@ -366,7 +374,7 @@ async def search(package_name: str):
         print_error(f"パッケージの検索中にエラーが発生しました: {str(e)}")
         my_logger(f"search package: {package_name} - 例外エラー: {str(e)}", level='ERROR')
 
-async def install(package_name: str, version_spec: str = None):
+async def install(package_name: str, server_url: str, version_spec: str = None):
     """
     指定されたパッケージをインストールします。
 
@@ -374,6 +382,7 @@ async def install(package_name: str, version_spec: str = None):
         package_name (str): インストールするパッケージ名
         version_spec (str, optional): インストールするバージョン. 
                                        指定しない場合は最新バージョンがインストールされます。
+        server_url (str): サーバーのURL
     """
     try:
         my_logger(f"install: パッケージ名 - {package_name}, バージョン指定 - {version_spec}", level='INFO')
@@ -386,7 +395,7 @@ async def install(package_name: str, version_spec: str = None):
         my_logger("install: APIリクエスト送信開始", level='INFO')
         async with aiohttp.ClientSession() as session:
             my_logger("install: aiohttp.ClientSession 開始", level='DEBUG')
-            async with session.post(f"{SERVER_URL}/packages/install", json=data) as response:
+            async with session.post(f"{server_url}/packages/install", json=data) as response:
                 my_logger("install: POSTリクエスト送信", level='DEBUG')
                 response.raise_for_status()
                 import base64
@@ -434,16 +443,17 @@ async def install(package_name: str, version_spec: str = None):
     except Exception as e:
         print_error(f"パッケージのインストール中にエラーが発生しました: {str(e)}")
         my_logger(f"install: 例外エラー - {str(e)}", level='ERROR')
-async def update(package_name: str):
+async def update(package_name: str, server_url: str):
     """
     指定されたパッケージを更新します。
 
     Args:
         package_name (str): 更新するパッケージ名
+        server_url (str): サーバーのURL
     """
     try:
         my_logger(f"update package: {package_name} - APIリクエストを送信中", level='INFO')
-        response = make_api_request("POST", f"{SERVER_URL}/packages/update/{package_name}")
+        response = make_api_request("POST", f"{server_url}/packages/update/{package_name}")
         my_logger(f"update package: {package_name} - レスポンス受信: {response.json()}")
         print_success(response.json()["message"])
     except requests.exceptions.HTTPError as err:
@@ -453,16 +463,17 @@ async def update(package_name: str):
         print_error(f"パッケージの更新中にエラーが発生しました: {str(e)}")
         my_logger(f"update package: {package_name} - 例外エラー: {str(e)}", level='ERROR')
 
-async def uninstall(package_name: str):
+async def uninstall(package_name: str, server_url: str):
     """
     指定されたパッケージをアンインストールします。
 
     Args:
         package_name (str): アンインストールするパッケージ名
+        server_url (str): サーバーのURL
     """
     try:
         my_logger(f"uninstall package: {package_name} - APIリクエストを送信中")
-        response = make_api_request("DELETE", f"{SERVER_URL}/packages/uninstall/{package_name}")
+        response = make_api_request("DELETE", f"{server_url}/packages/uninstall/{package_name}")
         print_success(response.json()["message"])
     except requests.exceptions.HTTPError as err:
         print_error(f"パッケージのアンインストールに失敗しました: {err.response.text}")
@@ -472,11 +483,12 @@ async def uninstall(package_name: str):
         my_logger(f"uninstall package: {package_name} - 例外エラー: {str(e)}", level='ERROR')
 
 
-async def upload(package_path: str):
+async def upload(package_path: str, server_url: str):
     """
     指定されたパッケージをアップロードします。
     Args:
         package_path (str): アップロードするパッケージのディレクトリパス
+        server_url (str): サーバーのURL
     """
     try:
         my_logger(f"パッケージパス = {package_path}")
@@ -499,7 +511,7 @@ async def upload(package_path: str):
                 my_logger(f"zipファイルオープン: {zip_file_path}", level='DEBUG')
                 response = make_api_request(
                     "POST",
-                    f"{SERVER_URL}/upload",
+                    f"{server_url}/upload",
                     files={"package": (metadata["name"] + "-" + metadata["version"] + ".zip", package_file)},  # ファイル名を設定
                     data=metadata,
                 )
@@ -515,12 +527,15 @@ async def upload(package_path: str):
         my_logger(f"アップロード中にエラーが発生しました: {str(e)}", level='ERROR')
         my_logger(f"エラー = {str(e)}", level='DEBUG')
 
-async def list_packages():
+async def list_packages(server_url: str):
     """
     インストール済みのパッケージを一覧表示します。
+
+    Args:
+        server_url (str): サーバーのURL
     """
     try:
-        response = make_api_request("GET", f"{SERVER_URL}/packages")
+        response = make_api_request("GET", f"{server_url}/packages")
         my_logger(f"APIリクエスト送信完了 - ステータスコード: {response.status_code}", level='DEBUG')
         packages = response.json()
         my_logger(f"レスポンス内容: {packages}", level='DEBUG')
