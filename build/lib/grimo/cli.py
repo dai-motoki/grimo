@@ -66,10 +66,12 @@ from grimo.utils import print_success, print_error, print_warning
 GRIMO_TOKEN_PATH = ".grimo_token"
 
 
-async def login(server_url):
+async def login(server_url, email, password):
     """Supabase にメールアドレスとパスワードでログインし、認証トークンを保存します。"""
-    email = input("メールアドレス: ")
-    password = getpass("パスワード: ")
+    # email と password が指定されていない場合、標準入力を受け付ける
+    if email is None or password is None:
+        email = input("メールアドレスを入力してください: ")
+        password = input("パスワードを入力してください: ")
 
     async with aiohttp.ClientSession() as session:  # aiohttp セッションを開始
         try:
@@ -90,11 +92,11 @@ async def login(server_url):
             print_error(f"ログイン中にエラーが発生しました: {str(e)}")
             my_logger(f"例外エラー - {str(e)}", level='ERROR')
 
-async def signup(server_url):
+async def signup(server_url, email, password):
     """Supabase に新規ユーザーを登録します。"""
-    email = input("メールアドレス: ")
-    password = getpass("パスワード: ")
-
+    if email is None or password is None:
+        email = input("メールアドレスを入力してください: ")
+        password = input("パスワードを入力してください: ")
     async with aiohttp.ClientSession() as session:  # aiohttp セッションを開始
         try:
             my_logger(f"新規登録リクエストを送信中 - URL: {server_url}/signup, Email: {email}", level='INFO')
@@ -240,11 +242,23 @@ def main():
         default=DEFAULT_SERVER_URL,
         help="サーバーのURLを指定します。デフォルトは 'https://grimo-f0b5594b2437.herokuapp.com' です。",
     )
+    parser.add_argument(
+        "--email",
+        type=str,
+        help="メールアドレスを指定します。",
+    )
+    parser.add_argument(
+        "--password",
+        type=str,
+        help="パスワードを指定します。",
+    )
     args, unknown = parser.parse_known_args()
     i18n.set("locale", args.lang)
     my_logger(f"言語設定 - {args.lang}", level='DEBUG')
     server_url = args.server_url
     my_logger(f"サーバーURL設定 - {server_url}", level='DEBUG')
+    email = args.email
+    password = args.password
 
     # --- Main Argument Parser ---
     parser = grimo.argparse_multi.ArgumentParser(
@@ -258,11 +272,11 @@ def main():
 
     # --- Login Subcommand ---
     login_parser = subparsers.add_parser("login", help="Grimo にログインします")
-    login_parser.set_defaults(func=lambda args: login(server_url))
+    login_parser.set_defaults(func=lambda args: login(server_url, email, password))
 
     # --- Signup Subcommand ---
     signup_parser = subparsers.add_parser("signup", help="Grimo に新規登録します")
-    signup_parser.set_defaults(func=lambda args: signup(server_url))
+    signup_parser.set_defaults(func=lambda args: signup(server_url, email, password))
 
     # --- Search Subcommand ---
     search_parser = subparsers.add_parser(
