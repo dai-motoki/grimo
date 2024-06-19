@@ -55,15 +55,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # - name: 環境変数を設定
-      #   run: |
-      #     echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
-      #     echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV 
+      - name: 環境変数を設定
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV 
 
-      # - name: 依存関係をインストール
-      #   run: |
-      #     pip install --upgrade grimo niwatoko
-      #     niwatoko -v 
+      - name: 依存関係をインストール
+        run: |
+          pip install --upgrade grimo niwatoko
+          niwatoko -v 
 
       - name: テストサーバー起動
         run: |
