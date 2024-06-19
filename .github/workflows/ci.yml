@@ -73,13 +73,11 @@ jobs:
 
       - name: サインアップテスト
         run: |
-          echo "test@example.com" | grimo signup --server-url "http://localhost:8000"
-          echo "password" | grimo signup --server-url "http://localhost:8000"
+          grimo signup --server-url "http://localhost:8000" --email "test@example.com" --password "password"
 
       - name: ログインテスト
         run: |
-          echo "test@example.com" | grimo login --server-url "http://localhost:8000"
-          echo "password" | grimo login --server-url "http://localhost:8000"
+          grimo login --server-url "http://localhost:8000" --email "test@example.com" --password "password"
       - name: パッケージアップロードテスト
         run: |
           grimo --server-url "http://localhost:8000" upload test-package
