@@ -71,11 +71,15 @@ jobs:
           uvicorn server:app --host 0.0.0.0 --port 8000 &
           sleep 5
 
+      - name: サインアップテスト
+        run: |
+          echo "test@example.com" | grimo signup --server-url "http://localhost:8000"
+          echo "password" | grimo signup --server-url "http://localhost:8000"
+
       - name: ログインテスト
         run: |
           echo "test@example.com" | grimo login --server-url "http://localhost:8000"
           echo "password" | grimo login --server-url "http://localhost:8000"
-
       - name: パッケージアップロードテスト
         run: |
           grimo --server-url "http://localhost:8000" upload test-package
