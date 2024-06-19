@@ -1,73 +1,73 @@
-name: CD
+# name: CD
 
-on:
-  push:
-    tags:
-      - 'v*'
+# on:
+#   push:
+#     tags:
+#       - 'v*'
 
-jobs:
+# jobs:
 
-  build-and-push-docker-image:
-    runs-on: ubuntu-latest
+#   build-and-push-docker-image:
+#     runs-on: ubuntu-latest
     
-    steps:
-    - uses: actions/checkout@v2
+#     steps:
+#     - uses: actions/checkout@v2
     
-    - name: Build Docker image
-      run: |
-        docker build -t grimo:${{ github.ref_name }} .
-        docker tag grimo:${{ github.ref_name }} username/grimo:${{ github.ref_name }}
+#     - name: Build Docker image
+#       run: |
+#         docker build -t grimo:${{ github.ref_name }} .
+#         docker tag grimo:${{ github.ref_name }} username/grimo:${{ github.ref_name }}
         
-    - name: Login to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+#     - name: Login to Docker Hub
+#       uses: docker/login-action@v1
+#       with:
+#         username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
         
-    - name: Push Docker image
-      run: |
-        docker push username/grimo:${{ github.ref_name }}
+#     - name: Push Docker image
+#       run: |
+#         docker push username/grimo:${{ github.ref_name }}
 
-  release-to-pypi:
-    runs-on: ubuntu-latest
+#   release-to-pypi:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
+#     steps:
+#     - uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
+#     - name: Set up Python
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: '3.x'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pip
+#         pip install setuptools wheel twine
         
-    - name: Build package
-      run: |
-        python setup.py sdist bdist_wheel
+#     - name: Build package
+#       run: |
+#         python setup.py sdist bdist_wheel
         
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+#     - name: Publish package
+#       uses: pypa/gh-action-pypi-publish@master
+#       with:
+#         user: __token__
+#         password: ${{ secrets.PYPI_API_TOKEN }}
 
-このワークフローでは、以下の処理を行っています。
+# このワークフローでは、以下の処理を行っています。
 
-1. `on` セクションで、`v*` タグがプッシュされたときにワークフローを実行するように設定。
+# 1. `on` セクションで、`v*` タグがプッシュされたときにワークフローを実行するように設定。
 
-2. `build-and-push-docker-image` ジョブ:
-   - Dockerイメージをビルド
-   - タグ名を `grimo:タグ名` と `username/grimo:タグ名` に設定
-   - Docker Hub にログイン (シークレットに `DOCKER_HUB_USERNAME` と `DOCKER_HUB_ACCESS_TOKEN` を設定しておく)
-   - Docker Hub にイメージをプッシュ
+# 2. `build-and-push-docker-image` ジョブ:
+#    - Dockerイメージをビルド
+#    - タグ名を `grimo:タグ名` と `username/grimo:タグ名` に設定
+#    - Docker Hub にログイン (シークレットに `DOCKER_HUB_USERNAME` と `DOCKER_HUB_ACCESS_TOKEN` を設定しておく)
+#    - Docker Hub にイメージをプッシュ
 
-3. `release-to-pypi` ジョブ:
-   - Pythonのセットアップ
-   - 依存パッケージ (setuptools, wheel, twine) のインストール
-   - パッケージのビルド (`python setup.py sdist bdist_wheel`)
-   - PyPI へのパッケージ公開 (シークレットに `PYPI_API_TOKEN` を設定しておく)
+# 3. `release-to-pypi` ジョブ:
+#    - Pythonのセットアップ
+#    - 依存パッケージ (setuptools, wheel, twine) のインストール
+#    - パッケージのビルド (`python setup.py sdist bdist_wheel`)
+#    - PyPI へのパッケージ公開 (シークレットに `PYPI_API_TOKEN` を設定しておく)
 
-これにより、タグがプッシュされるたびに、自動的にDockerイメージがビルド・プッシュされ、PyPIにパッケージが公開されます。
+# これにより、タグがプッシュされるたびに、自動的にDockerイメージがビルド・プッシュされ、PyPIにパッケージが公開されます。
