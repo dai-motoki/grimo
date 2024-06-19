@@ -25,7 +25,7 @@ jobs:
       - name: 環境変数を設定
         run: |
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
-          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV 
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV
 
       - name: 依存関係をインストール
         run: |
@@ -57,48 +57,59 @@ jobs:
       - name: 環境変数を設定
         run: |
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
-          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV 
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV
+
+      # echo "SERVER_URL=http://localhost:8000" >> $GITHUB_ENV
 
       - name: 依存関係をインストール
         run: |
           pip install --upgrade grimo niwatoko uvicorn
           niwatoko -v 
 
-      - name: テストサーバー起動
-        run: |
-          cd auth
-          ls -la
-          # uvicorn server:app --host 0.0.0.0 --port 8000 &
-          uvicorn server:app --reload
-          sleep 5
-
+      # - name: テストサーバー起動
+      #   run: |
+      #     cd auth
+      #     ls -la
+      #     # uvicorn server:app --host 0.0.0.0 --port 8000 &
+      #     uvicorn server:app --reload
+      #     sleep 5
+      # server.pyはheroku上で起動しており、gihhubで管理されていない
       - name: サインアップテスト
         run: |
-          grimo signup --server-url "http://localhost:8000" --email "test@example.com" --password "password"
+          grimo signup --email "test@example.com" --password "password"
 
       - name: ログインテスト
         run: |
-          grimo login --server-url "http://localhost:8000" --email "test@example.com" --password "password"
-      - name: パッケージアップロードテスト
-        run: |
-          grimo --server-url "http://localhost:8000" upload test-package
+          grimo login --email "test@example.com" --password "password"
 
-      - name: パッケージ検索テスト
-        run: |
-          grimo --server-url "http://localhost:8000" search test-package
+      # - name: サインアップテスト
+      #   run: |
+      #     grimo signup --server-url "${{ env.SERVER_URL }}" --email "test@example.com" --password "password"
 
-      - name: パッケージインストールテスト
-        run: |
-          grimo --server-url "http://localhost:8000" install test-package
+      # - name: ログインテスト
+      #   run: |
+      #     grimo login --server-url "${{ env.SERVER_URL }}" --email "test@example.com" --password "password"
 
-      - name: パッケージアップデートテスト
-        run: |
-          grimo --server-url "http://localhost:8000" update test-package
+      # - name: パッケージアップロードテスト
+      #   run: |
+      #     grimo --server-url "${{ env.SERVER_URL }}" upload test-package
 
-      - name: パッケージアンインストールテスト
-        run: |
-          grimo --server-url "http://localhost:8000" uninstall test-package
+      # - name: パッケージ検索テスト
+      #   run: |
+      #     grimo --server-url "${{ env.SERVER_URL }}" search test-package
 
-      - name: インストール済みパッケージ一覧表示テスト
-        run: |
-          grimo --server-url "http://localhost:8000" list
+      # - name: パッケージインストールテスト
+      #   run: |
+      #     grimo --server-url "${{ env.SERVER_URL }}" install test-package
+
+      # - name: パッケージアップデートテスト
+      #   run: |
+      #     grimo --server-url "${{ env.SERVER_URL }}" update test-package
+
+      # - name: パッケージアンインストールテスト
+      #   run: |
+      #     grimo --server-url "${{ env.SERVER_URL }}" uninstall test-package
+
+      # - name: インストール済みパッケージ一覧表示テスト
+      #   run: |
+      #     grimo --server-url "${{ env.SERVER_URL }}" list
